@@ -5,12 +5,10 @@ namespace App\Http\Controllers;
 
 
 use App\Http\Controllers\Controller;
-
 use App\Models\Category;
 use App\Models\Product;
-
 use Carbon\Carbon;
-
+use App\Models\Distributor;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,14 +18,20 @@ use Str;
 
 class DispatchController extends Controller
 {
-    public function index()
+    public function create()
     {
-        return view('dispatch.create');
+        $distributors = Distributor::all();
+        return view('dispatch.create', compact('distributors'));
     }
 
-    public function print()
+    public function index()
     {
-        return view('dispatch.print');
+        return view('dispatch.index');
+    }
+
+    public function show()
+    {
+        return view('dispatch.show');
     }
 
     // public function approvedPurchases()

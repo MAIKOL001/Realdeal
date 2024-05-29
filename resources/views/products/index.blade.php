@@ -14,10 +14,11 @@
                 </center>
             </div>
         @else
-            <div class="container-xl">
-                <x-alert />
-                @livewire('tables.product-table')
-            </div>
+           
         @endif
+        <div class="container-xl">
+            <x-alert />
+            @livewire('tables.product-table')
+        </div>
     </div>
 @endsection

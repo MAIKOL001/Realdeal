@@ -17,7 +17,7 @@
                             <div class="card-header">
                                 <div>
                                     <h3 class="card-title">
-                                        {{ __('Assign Order for Delivery') }}
+                                        {{ __('Dispatch Orders for Delivery') }}
                                     </h3>
                                 </div>
 
@@ -60,12 +60,12 @@
                                             {{ __('Rider/Agent') }}
                                         </label>
 
-                                        <input type="text" class="form-control"
-                                               id="distributor"
-                                               name="distributor"
-                                               value=""
-                                               
-                                        >
+                                        <select class="form-select" id="distributor" name="distributor">
+                                            <option value="">Select Rider/Agent</option>
+                                            @foreach($distributors as $distributor)
+                                                <option value="{{ $distributor->id }}">{{ $distributor->name }}</option>
+                                            @endforeach
+                                        </select>
 
                                         @error('reference')
                                         <div class="invalid-feedback">
@@ -130,33 +130,17 @@
                                 
                                                 <td class="align-middle text-center">
                                                 </td>
-                                                
-                                                {{--- Unit Price ---}}
+                                              
                                                 <td class="align-middle text-center">
-                                                   
-                                
-                                                        <input type="hidden"
-                                                               name="invoiceProducts"
-                                                               value=""
-                                                        >
-                                                    
                                                 </td>
                                 
-                                                {{--- Total ---}}
+                                              
                                                 <td class="align-middle text-center">
-                                                    
-                                
-                                                    <input type="hidden"
-                                                           name="invoiceProducts"
-                                                           value=""
-                                                    >
                                                 </td>
 
                                                 <td class="align-middle text-center">
                                             </td>
                                                 <td class="align-middle text-center">
-                                                   
-                                             
                                                     <button type="button" wire:click="removeProduct" class="btn btn-icon btn-outline-danger">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
                                                     </button>
@@ -171,7 +155,7 @@
 
                             <div class="card-footer text-end">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Assign') }}
+                                    {{ __('Dispatch') }}
                                 </button>
                             </div>
                         </div>

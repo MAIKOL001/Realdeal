@@ -160,4 +160,14 @@ class ProductController extends Controller
             ->route('products.index')
             ->with('success', 'Product has been deleted!');
     }
+
+
+    public function generate(Request $request)
+{
+    $productCode = $request->get('productCode');
+    $product = Product::where('code', $productCode)->firstOrFail();
+
+     return view('qrgeneration', compact('product')); // Pass product data to view
+}
+
 }

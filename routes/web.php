@@ -18,6 +18,7 @@ use App\Http\Controllers\Product\ProductExportController;
 use App\Http\Controllers\Product\ProductImportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Purchase\PurchaseController;
+use App\Http\Controllers\CodeController;
 use App\Http\Controllers\Quotation\QuotationController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
@@ -72,6 +73,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('products/import/', [ProductImportController::class, 'store'])->name('products.import.store');
     Route::get('products/export/', [ProductExportController::class, 'create'])->name('products.export.store');
     Route::resource('/products', ProductController::class);
+    Route::get('/qrgeneration', [ProductController::class, 'generate'])->name('qrgeneration');
+    Route::get('/products/{productCode}/generate', [ProductController::class, 'generate'])
+    ->name('products.generate');
+
 
     // Route POS
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
@@ -123,6 +128,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/purchases/update/{purchase}', [PurchaseController::class, 'update'])->name('purchases.update');
     Route::delete('/purchases/delete/{purchase}', [PurchaseController::class, 'destroy'])->name('purchases.delete');
 
+    //qrcodes
+    // Route::get('/products/qrgeneration', [CodeController::class,'index'])->name('products.qrgeneration');
+
+
     //Route sheet
     Route::get('/sheets', [SheetController::class, 'index'])->name('fetchingsheets');
     Route::post('/sheets', [SheetController::class, 'store'])->name('sheets.store');
@@ -135,20 +144,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
    
 
     //Route Dispatch
-    
-    
+    Route::get('/dispatch/create', [DispatchController::class, 'create'])->name('dispatch.create');
+    Route::get('/dispatch/index', [DispatchController::class, 'index'])->name('dispatch.index');
+    Route::get('/dispatch/show', [DispatchController::class, 'show'])->name('dispatch.show');
+    //Distributors
     Route::get('/distributors', [DistributorController::class, 'index'])->name('distributors.index');
     Route::get('/distributors/create', [DistributorController::class, 'create'])->name('distributors.create');
     Route::post('/distributors', [DistributorController::class, 'store'])->name('distributors.store');
     
     // Optional routes for edit and update functionality
-    Route::get('/distributors/{distributor}/edit', [DistributorController::class, 'edit'])->name('distributors.edit');
-Route::put('/distributors/{distributor}/update', [DistributorController::class, 'update'])->name('distributors.update');
+            Route::get('/distributors/{distributor}/edit', [DistributorController::class, 'edit'])->name('distributors.edit');
+            Route::put('/distributors/{distributor}/update', [DistributorController::class, 'update'])->name('distributors.update');
 
-Route::delete('/distributors/{distributor}', [DistributorController::class, 'destroy'])->name('distributors.destroy');
+            Route::delete('/distributors/{distributor}', [DistributorController::class, 'destroy'])->name('distributors.destroy');
 
-
-    
+            //qrcode generation
+           
+                
     // Route Quotations
     // Route::post('/quotations/complete/{quotation}', [QuotationController::class, 'update'])->name('quotations.update');
     // Route::delete('/quotations/delete/{quotation}', [QuotationController::class, 'destroy'])->name('quotations.delete');
