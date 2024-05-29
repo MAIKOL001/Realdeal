@@ -9,7 +9,7 @@
         <div class="row row-cards">
 
             @if (isset($product))
-                <form action="{{ route('purchases.store') }}" method="POST">
+                <form action="" method="POST">
                     @csrf
                     <div class="row">
 
@@ -49,9 +49,21 @@
 
                                             <input type="text" class="form-control"
                                                 id="reference"
-                                                name="product_code"  value="{{ $product->code }}"
+                                                name="product_code"  value="{{ $product->code }} -"
                                                 readonly>
                                         </div>
+
+                                        <div class="col-md-4">
+                                            <label for="product code" class="form-label required">
+                                                {{ __('Parent product id') }}
+                                            </label>
+
+                                            <input type="text" class="form-control"
+                                                id="reference"
+                                                name=" Parent product id"  value="{{ $product->id }}"
+                                                readonly>
+                                        </div>
+
 
                                         <div class="col-md-4">
                                             <label for="product code" class="form-label required">
@@ -63,6 +75,17 @@
                                                 name="quantity"  value=""
                                                 required>
                                         </div>
+                                       
+                                        <div class="col-md-4" hidden>
+                                            <label for="product code" class="form-label required">
+                                                {{ __('Product unit id') }}
+                                            </label>
+    
+                                            <input type="text" class="form-control"
+                                                id="reference"
+                                                name="product_code"  value="{{ $product->unit_id}}"
+                                                readonly>
+                                        </div>
                                         <div class="col-md-4">
                                             <label for="product code" class="form-label required">
                                                 {{ __('Date generated') }}
@@ -72,22 +95,19 @@
                                                 id="reference"
                                                 name="product_code"  value="date">
                                         </div>
-                                        <div class="col-md-4" hidden>
-                                            <label for="product code" class="form-label required">
-                                                {{ __('Product unit id') }}
-                                            </label>
-    
-                                            <input type="text" class="form-control"
-                                                id="reference"
-                                                name="product_code"  value="{{ $product->unit_id }}"
-                                                readonly>
-                                        </div>
+                                        
+                                        
                                     </div>
                                    
-
-                                   
+                                </form>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        {{ __('Generate QRCodes') }}
+                                    </button>
+                                    </div>
 
                                     <div>
+                                        <form>
                                         <table class="table table-bordered" id="products_table">
                                             <thead class="thead-dark">
                                                 <tr>
@@ -100,12 +120,14 @@
                                                 <tr>
                                                    
                                                     <td class="align-middle text-center">PC-09-00000000001</td>
-                                                    
-                                                    
-                                                    <td class="align-middle text-center"></td>
+                                                   
+                                                    <td class="align-middle text-center">
+                                                        <img src="">
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </form>
                                     </div>
                                     
                                        
@@ -116,9 +138,9 @@
                             </div>
                         </div>
                     </div>
-                </form>
+               
                 <button type="submit" class="btn btn-primary">
-                    {{ __('Generate QRCodes') }}
+                    {{ __('Upload') }}
                 </button>
             @endif 
         </div>
