@@ -48,9 +48,21 @@
                                             </label>
 
                                             <input type="text" class="form-control"
-                                                id="reference"
-                                                name="product_code"  value="{{ $product->code }} -"
-                                                readonly>
+                                            id="productCode"
+                                            name="productCode"  value="{{ $product->code }} -"
+                                                readonly> 
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="product code" class="form-label required">
+                                                {{ __('Quantity') }}
+                                            </label>
+
+                                            <input type="number" class="form-control"
+                                            id="quantity"
+                                                name="quantity"  value=""
+                                                required>
+                                                
                                         </div>
 
                                         <div class="col-md-4">
@@ -65,16 +77,7 @@
                                         </div>
 
 
-                                        <div class="col-md-4">
-                                            <label for="product code" class="form-label required">
-                                                {{ __('Quantity') }}
-                                            </label>
-
-                                            <input type="number" class="form-control"
-                                                id="reference"
-                                                name="quantity"  value=""
-                                                required>
-                                        </div>
+                                        
                                        
                                         <div class="col-md-4" hidden>
                                             <label for="product code" class="form-label required">
@@ -85,6 +88,7 @@
                                                 id="reference"
                                                 name="product_code"  value="{{ $product->unit_id}}"
                                                 readonly>
+                                                
                                         </div>
                                         <div class="col-md-4">
                                             <label for="product code" class="form-label required">

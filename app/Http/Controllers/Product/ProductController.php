@@ -58,7 +58,7 @@ class ProductController extends Controller
             "code" => IdGenerator::generate([
                 'table' => 'products',
                 'field' => 'code',
-                'length' => 4,
+                'length' => 12,
                 'prefix' => 'PC-'
             ]),
 
