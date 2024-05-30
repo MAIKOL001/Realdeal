@@ -111,7 +111,8 @@
                                         <table class="table table-bordered" id="products_table">
                                             <thead class="thead-dark">
                                                 <tr>
-                                                    <th class="align-middle">Code</th>
+                                                    <th class="align-middle"></th>
+                                                    {{-- {!! DNS2D::getBarcodeHTML("$product->code",'QRCODE',) !!} --}}
                                                     <th class="align-middle text-center">Qr codes</th>
                                                     
                                                 </tr>
