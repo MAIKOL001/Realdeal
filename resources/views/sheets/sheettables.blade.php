@@ -34,6 +34,9 @@
                 <form method="GET" action="{{ route('sheets.show', $sheetId) }}">  @csrf
                     <div class="input-group">
                         <input type="date" name="date" class="form-control" placeholder="Select Date">
+
+
+
                         <button type="submit" class="btn btn-primary">Filter</button>
                     </div>
                 </form>
@@ -82,9 +85,9 @@
                                         <?php // Access data and format date within the loop ?>
                                         @php
                                             $cellStatus = isset($rowData[$statusColIndex]) ? strtolower($rowData[$statusColIndex]) : '';
-                                            $cellDate = isset($rowData[$dateColIndex]) ? date('m/d/Y', strtotime($rowData[$dataRows[$index][$dateColIndex]])) : '';
+                                            $cellDate = isset($rowData[$dateColIndex]) ? date('Y-m-d', strtotime($rowData[$dateColIndex])) : '';
                                         @endphp
-                                        @if ($cellStatus === $statusValue && $cellDate === $date)
+                                        @if ($cellDate === $formattedDate)
                                             <tr>
                                                 @foreach ($rowData as $colIndex => $cell)
                                                     <td class="align-middle text-center" style="width: 12rem;">
