@@ -27,16 +27,13 @@
                         <div>
                             {{-- <h3 class="card-title">Googlesheet Name: {{ $sheetName }}</h3> --}}
                         </div>
-                       
                     </div>
-                    
                 </div>
+                
                 <form method="GET" action="{{ route('sheets.show', $sheetId) }}">  @csrf
                     <div class="input-group">
                         <input type="date" name="date" class="form-control" placeholder="Select Date">
-
-
-
+                        <input type="text" name="status" class="form-control" placeholder="Enter Status">
                         <button type="submit" class="btn btn-primary">Filter</button>
                     </div>
                 </form>
