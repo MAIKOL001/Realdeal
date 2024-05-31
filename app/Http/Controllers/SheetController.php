@@ -107,6 +107,11 @@ class SheetController extends Controller
     
         return view('sheet.sheettables')->with('success', 'Sheet updated successfully.');
     }
+     
+    public function waybills()
+    {
+        return View ('waybill');
+    }
     
 
 }

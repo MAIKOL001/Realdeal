@@ -136,6 +136,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/sheets', [SheetController::class, 'index'])->name('fetchingsheets');
     Route::post('/sheets', [SheetController::class, 'store'])->name('sheets.store');
     Route::get('/sheets/{sheetId}', [SheetController::class, 'show'])->name('sheets.show');
+    Route::get('/waybill', [SheetController::class, 'waybills'])->name('waybill');
+    Route::get('/sheets/{sheetId}/waybill', [SheetController::class, 'printWaybill'])->name('sheets.printWaybill');
+    
+    
+
     // Route::post('/sheets/{sheetId}/update', [SheetController::class, 'update'])->name('sheets.update');
 
     //Route Distributors

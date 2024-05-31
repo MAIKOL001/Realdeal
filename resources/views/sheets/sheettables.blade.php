@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="page-body">
-        
         <div class="container-xl">
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -17,7 +16,6 @@
                 <div class="alert alert-success alert-dismissible" role="alert">
                     <h3 class="mb-1">Success</h3>
                     <p>{{ session('success') }}</p>
-
                     <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
                 </div>
             @endif
@@ -27,13 +25,21 @@
                         <div>
                             {{-- <h3 class="card-title">Googlesheet Name: {{ $sheetName }}</h3> --}}
                         </div>
+                        <div>
+                                <button type="submit" class="btn btn-primary">Upload</button>
+                        </div>
                     </div>
                 </div>
-                
-                <form method="GET" action="{{ route('sheets.show', $sheetId) }}">  @csrf
+                <form method="GET" action="{{ route('sheets.show', $sheetId) }}">  
+                    @csrf
                     <div class="input-group">
                         <input type="date" name="date" class="form-control" placeholder="Select Date">
-                        <input type="text" name="status" class="form-control" placeholder="Enter Status">
+                        <select name="status" class="form-control">
+                            <option value="">Select Status</option>
+                            <option value="paid">Paid</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="shipped">Shipped</option>
+                        </select>
                         <button type="submit" class="btn btn-primary">Filter</button>
                     </div>
                 </form>
@@ -63,7 +69,8 @@
                 <x-spinner.loading-spinner />
                 
                 <div class="table-responsive">
-                    @if (isset($header) && isset($dataRows))  <table wire:loading.remove class="table table-bordered card-table table-vcenter text-nowrap datatable">
+                    @if (isset($header) && isset($dataRows))
+                        <table wire:loading.remove class="table table-bordered card-table table-vcenter text-nowrap datatable">
                             <thead>
                                 <tr>
                                     @foreach ($header as $heading)
@@ -73,24 +80,21 @@
                             </thead>
                             <tbody>
                                 @if (isset($date) && isset($statusValue))
-                                    <?php // Access column indexes once outside the loop ?>
-                                     @php
+                                    @php
                                         $statusColIndex = 9;
                                         $dateColIndex = 6;
                                     @endphp
                                     @foreach ($dataRows as $index => $rowData)
-                                        <?php // Access data and format date within the loop ?>
                                         @php
                                             $cellStatus = isset($rowData[$statusColIndex]) ? strtolower($rowData[$statusColIndex]) : '';
                                             $cellDate = isset($rowData[$dateColIndex]) ? date('Y-m-d', strtotime($rowData[$dateColIndex])) : '';
                                         @endphp
-                                        @if ($cellDate === $formattedDate)
+                                        @if ($cellStatus === $statusValue && $cellDate === $date)
                                             <tr>
                                                 @foreach ($rowData as $colIndex => $cell)
                                                     <td class="align-middle text-center" style="width: 12rem;">
                                                         {{ $cell }}
                                                     </td>
-                                                
                                                 @endforeach
                                             </tr>
                                         @endif
@@ -109,18 +113,10 @@
                             </tbody>
                         </table>
                     @else
-                                <p>No data to display.</p>
-                            @endif
-                           
-                        
-                    </div>
+                        <p>No data to display.</p>
+                    @endif
                 </div>
-                    
-                    
-                
-
-
             </div>
-        
+        </div>
     </div>
 @endsection
