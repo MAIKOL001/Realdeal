@@ -11,12 +11,13 @@ class SupplierController extends Controller
 {
     public function index()
     {
-        $suppliers = Supplier::where("user_id", auth()->id())->count();
-
+        $supplierCount = Supplier::count();
+    
         return view('suppliers.index', [
-            'suppliers' => $suppliers
+            'supplierCount' => $supplierCount
         ]);
     }
+    
 
     public function create()
     {

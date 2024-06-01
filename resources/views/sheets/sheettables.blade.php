@@ -75,6 +75,7 @@
                                 <tr>
                                     @foreach ($header as $heading)
                                         <th scope="col" class="align-middle text-center">{{ $heading }}</th>
+                                        
                                     @endforeach
                                 </tr>
                             </thead>
@@ -95,6 +96,7 @@
                                                     <td class="align-middle text-center" style="width: 12rem;">
                                                         {{ $cell }}
                                                     </td>
+                                                    
                                                 @endforeach
                                             </tr>
                                         @endif
@@ -104,8 +106,9 @@
                                         <tr>
                                             @foreach ($rowData as $colIndex => $cell)
                                                 <td class="align-middle text-center" style="width: 12rem;">
-                                                    {{ $cell }}
+                                           {{ $cell }}
                                                 </td>
+                                                
                                             @endforeach
                                         </tr>
                                     @endforeach

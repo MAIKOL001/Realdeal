@@ -137,6 +137,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/sheets', [SheetController::class, 'store'])->name('sheets.store');
     Route::get('/sheets/{sheetId}', [SheetController::class, 'show'])->name('sheets.show');
     Route::get('/waybill', [SheetController::class, 'waybills'])->name('waybill');
+ 
+    //Route::put('/sheets/{sheetId}/update', [SheetController::class, 'update'])->name('sheets.update');
+
+    Route::put('/sheets/{sheet}/update', [SheetController::class, 'update'])->name('sheets.update');
     Route::get('/sheets/{sheetId}/waybill', [SheetController::class, 'printWaybill'])->name('sheets.printWaybill');
     
     

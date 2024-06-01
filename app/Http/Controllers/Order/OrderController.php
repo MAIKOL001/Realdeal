@@ -24,7 +24,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::where('user_id', auth()->id())->count();
+        $orders = Order::count();
 
         return view('orders.index', [
             'orders' => $orders
