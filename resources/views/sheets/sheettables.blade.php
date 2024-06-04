@@ -23,102 +23,94 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <div>
-                            {{-- <h3 class="card-title">Googlesheet Name: {{ $sheetName }}</h3> --}}
+                            <h3 class="card-title">Spreadsheet Name: {{ $sheetNameFilter }}</h3>
                         </div>
-                        <div>
-                                <button type="submit" class="btn btn-primary">Upload</button>
-                        </div>
+                        
                     </div>
                 </div>
-                <form method="GET" action="{{ route('sheets.show', $sheetId) }}">  
-                    @csrf
-                    <div class="input-group">
-                        <input type="date" name="date" class="form-control" placeholder="Select Date">
-                        <select name="status" class="form-control">
-                            <option value="">Select Status</option>
-                            <option value="paid">Paid</option>
-                            <option value="cancelled">Cancelled</option>
-                            <option value="shipped">Shipped</option>
+               <!-- Filter Form -->
+               <form method="GET" action="{{ route('sheets.show', $sheetId) }}">
+                @csrf
+                <div class="row gx-3 mb-3 p-3">
+                    <div class="col-md-4">
+                        <select class="form-select" id="status" name="status">
+                            <option value="">All</option>
+                            <option value="schedulled" @if($status == 'schedulled') selected @endif>Schedulled</option>
+                            <option value="cancelled" @if($status == 'cancelled') selected @endif>Cancelled</option>
+                            <option value="returned" @if($status == 'returned') selected @endif>Returned</option>
+                            <option value="reschedulled" @if($status == 'reschedulled') selected @endif>Reschedulled</option>
                         </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="date" class="form-control" id="date" name="date" value="{{ $date }}">
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="sheet_name" name="sheet_name">
+                            <option value="Sheet1" {{ request('sheet_name') == 'Sheet1' ? 'selected' : '' }}>Sheet1</option>
+                            <option value="Sheet2" {{ request('sheet_name') == 'Sheet2' ? 'selected' : '' }}>Sheet2</option>
+                            <option value="Sheet3" {{ request('sheet_name') == 'Sheet3' ? 'selected' : '' }}>Sheet3</option>
+                            <!-- Add more sheets as needed -->
+                        </select>
+                    </div>
+                    <div class="col-md-4" style="padding-top: 0.5rem;">
                         <button type="submit" class="btn btn-primary">Filter</button>
                     </div>
-                </form>
-                <div class="card-body border-bottom py-3">
+                </div>
+            </form>
                     <div class="d-flex">
                         <div class="text-secondary">
-                            Show
-                            <div class="mx-2 d-inline-block">
-                                <select wire:model="perPage" class="form-select form-select-sm" aria-label="result per page">
-                                    <option value="5">5</option>
-                                    <option value="10">10</option>
-                                    <option value="15">15</option>
-                                    <option value="25">25</option>
-                                </select>
-                            </div>
-                            entries
+                           
                         </div>
                         <div class="ms-auto text-secondary">
-                            Search:
-                            <div class="ms-2 d-inline-block">
-                                <input type="text" wire:model="search" class="form-control form-control-sm" aria-label="Search invoice">
-                            </div>
+                            <form method="POST" action="{{ route('sheets.update', $sheetId) }}">
+                                @csrf
+                                @method('PUT')
+                                <div class="col-md-4">
+                               
+                                </div>
                         </div>
                     </div>
-                </div>
                 
+                    <div class="col-md-4" hidden>
+                        <label for="sheet_name" class="form-label">Sheet Name:</label>
+                        <input type="text" class="form-control" id="sheet_name" name="sheet_name" placeholder="Sheet1" required value="{{ $sheetNameFilter }}">
+                    </div>
                 <x-spinner.loading-spinner />
-                
-                <div class="table-responsive">
-                    @if (isset($header) && isset($dataRows))
-                        <table wire:loading.remove class="table table-bordered card-table table-vcenter text-nowrap datatable">
-                            <thead>
-                                <tr>
-                                    @foreach ($header as $heading)
-                                        <th scope="col" class="align-middle text-center">{{ $heading }}</th>
-                                        
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (isset($date) && isset($statusValue))
-                                    @php
-                                        $statusColIndex = 9;
-                                        $dateColIndex = 6;
-                                    @endphp
-                                    @foreach ($dataRows as $index => $rowData)
-                                        @php
-                                            $cellStatus = isset($rowData[$statusColIndex]) ? strtolower($rowData[$statusColIndex]) : '';
-                                            $cellDate = isset($rowData[$dateColIndex]) ? date('Y-m-d', strtotime($rowData[$dateColIndex])) : '';
-                                        @endphp
-                                        @if ($cellStatus === $statusValue && $cellDate === $date)
-                                            <tr>
-                                                @foreach ($rowData as $colIndex => $cell)
-                                                    <td class="align-middle text-center" style="width: 12rem;">
-                                                        {{ $cell }}
-                                                    </td>
-                                                    
-                                                @endforeach
-                                            </tr>
-                                        @endif
-                                    @endforeach
-                                @else
+                <button type="submit" class="btn btn-success">Update All</button>
+            </div>
+        </div>
+                    <div class="table-responsive" style="padding-top:1rem; ">
+                        @if (isset($header) && isset($dataRows))
+                        
+                            <table wire:loading.remove class="table table-bordered   text-nowrap datatable ">
+                                <thead>
+                                    <tr>
+                                        @foreach ($header as $heading)
+                                            <th scope="col" class="align-middle text-center">{{ $heading }}        </th>
+                                        @endforeach
+                                        <th scope="col" class="align-middle text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     @foreach ($dataRows as $index => $rowData)
                                         <tr>
                                             @foreach ($rowData as $colIndex => $cell)
-                                                <td class="align-middle text-center" style="width: 12rem;">
-                                           {{ $cell }}
+                                                <td class="align-middle text-center">
+                                                    <input type="text" name="data[{{ $index }}][{{ $colIndex }}]" value="{{ $cell }}" class="form-control" >
                                                 </td>
-                                                
                                             @endforeach
+                                            <td class="align-middle text-center">
+                                                <button type="submit" class="btn btn-success">Update</button>
+                                            </td>
                                         </tr>
                                     @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    @else
-                        <p>No data to display.</p>
-                    @endif
-                </div>
+                                </tbody>
+                            </table>
+                        @else
+                            <p>No data to display.</p>
+                        @endif
+                    </div>
+                </form>
             </div>
         </div>
     </div>

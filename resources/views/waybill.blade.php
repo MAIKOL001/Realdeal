@@ -29,14 +29,16 @@
                             <div class="row">
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="logo">
-                                        <h1>REALDEAL LOGISTICS</h1>
+                                        <h4 style="color: blue">Realdeal Logistics</h4>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-sm-6">
                                     <div class="invoice">
-                                        <h1>
+                                        <h4 style="color: orange">
                                             Order No # <span>01000</span>
-                                        </h1>
+                                            {!! DNS2D::getBarcodeHTML("Order No # <span>01000</span>", 'QRCODE', 3, 3) !!}
+
+                                        </h4>
                                     </div>
                                 </div>
                             </div>
@@ -55,19 +57,22 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-6 mb-50">
-                                    <h4 class="inv-title-1">Customer</h4>
-                                    <p class="inv-from-1">Client Name</p>
-                                    <p class="inv-from-1">Client Phone</p>
-                                    <p class="inv-from-1">Date</p>
-                                    <p class="inv-from-2">Client City</p>
-                                </div>
-                               
-                                <div class="col-sm-6 text-end mb-50">
-                                    <h4 class="inv-title-1">Realdeal Logistics</h4>
+          
+                                
+                                    <div class="col-sm-6 mb-50">
+                                    <h3 class="inv-title-1">Shipped From:</h3>
+                                    <p class="inv-title-1">Realdeal Logistics</p>
                                     <p class="inv-from-1">+254 758 928 555</p>
                                     <p class="inv-from-1">Realdeallogistics@gmail.com</p>
                                     <p class="inv-from-2">"Your trusted delivery company"</p>
+                                </div>
+
+                                <div class="col-sm-6 text-end mb-50">
+                                    <h4 class="inv-title-1">Shipped To:</h4>
+                                    <p class="inv-from-1">Maikol Seff</p>
+                                    <p class="inv-from-1">078909766 / 786577899</p>
+                                    <p class="inv-from-1">09-07-2024</p>
+                                    <p class="inv-from-2">Kisumu</p>
                                 </div>
                             </div>
                         </div>
@@ -76,10 +81,10 @@
                                 <table class="default-table invoice-table">
                                     <thead>
                                         <tr>
-                                            <th class="align-middle">Item</th>
-                                            <th class="align-middle text-center">Amount</th>
-                                            <th class="align-middle text-center">Quantity</th>
-                                            <th class="align-middle text-center">Total Amount</th>
+                                            <th class="align-middle" style="color: orange">Item</th>
+                                            <th class="align-middle text-center" style="color: orange">Amount</th>
+                                            <th class="align-middle text-center" style="color: orange">Quantity</th>
+                                            <th class="align-middle text-center" style="color: orange">Total Amount</th>
                                         </tr>
                                     </thead>
 
@@ -121,9 +126,9 @@
                         </div>
                         <div class="invoice-informeshon-footer">
                                 <ul>
-                                    <li><a href="#">www.Realdeal logistics.com</a></li>
-                                    <li><a href="Realdeal logistics.com">Realdeal Logistics.com</a></li>
-                                    <li><a href="tel:+088-01737-133959">+254 712 345 678</a></li>
+                                    <li><a href="#">Goods are to be paid via the paybill</a></li>
+                                    <li><a href="Realdeal logistics.com">Paybill no: 910200</a></li>
+                                    <li><a href="tel:+088-01737-133959">Account no:2110119703 </a></li>
                                 </ul>
                             </div>
                     </div>

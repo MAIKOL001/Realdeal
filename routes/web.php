@@ -138,9 +138,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/sheets/{sheetId}', [SheetController::class, 'show'])->name('sheets.show');
     Route::get('/waybill', [SheetController::class, 'waybills'])->name('waybill');
  
-    //Route::put('/sheets/{sheetId}/update', [SheetController::class, 'update'])->name('sheets.update');
+   
 
-    Route::put('/sheets/{sheet}/update', [SheetController::class, 'update'])->name('sheets.update');
+    Route::put('/sheets/{sheetId}/update', [SheetController::class, 'update'])->name('sheets.update');
     Route::get('/sheets/{sheetId}/waybill', [SheetController::class, 'printWaybill'])->name('sheets.printWaybill');
     
     
@@ -155,7 +155,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Route Dispatch
     Route::get('/dispatch/create', [DispatchController::class, 'create'])->name('dispatch.create');
     Route::get('/dispatch/index', [DispatchController::class, 'index'])->name('dispatch.index');
-    Route::get('/dispatch/show', [DispatchController::class, 'show'])->name('dispatch.show');
+    Route::get('/dispatch/{sheetId}', [DispatchController::class, 'show'])->name('dispatch.show');
     //Distributors
     Route::get('/distributors', [DistributorController::class, 'index'])->name('distributors.index');
     Route::get('/distributors/create', [DistributorController::class, 'create'])->name('distributors.create');

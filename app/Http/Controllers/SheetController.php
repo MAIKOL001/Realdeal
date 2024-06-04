@@ -7,20 +7,14 @@ use Google\Service\Sheets\Sheet as SheetsSheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-
-
-
 use Revolution\Google\Sheets\Facades\Sheets;
-
 
 class SheetController extends Controller
 {
-    //
     public function index()
     {
         $sheets = Sheet::all();
         
-        // Assuming Sheet is your Eloquent model for the 'sheets' table
         return view('sheets.index', compact('sheets'));
     }
 
@@ -45,139 +39,128 @@ class SheetController extends Controller
             $sheet = Sheet::where('sheet_id', $sheetId)->first();
     
             if (!$sheet) {
-                // Handle case where sheet not found (optional: redirect or display error message)
                 return abort(404);
             }
     
-            $sheetName = $sheet->sheet_name;
-            $sheetData = Sheets::spreadsheet($sheetId)->sheet('Sheet1')->all();
+            // Default to 'Sheet1' if no sheet name is provided in the request
+            $sheetNameFilter = $request->get('sheet_name', 'Sheet1');
     
-            $header = $sheetData[0]; // Access the first element (header row)
-            $dataRows = array_slice($sheetData, 1); // Extract data rows
+            // Fetch data from the specified sheet
+            $sheetData = Sheets::spreadsheet($sheetId)->sheet($sheetNameFilter)->all();
     
-            // Access user email using Laravel authentication
+            if (empty($sheetData)) {
+                return view('sheets.sheettables', [
+                    'message' => 'No data found in the selected sheet',
+                    'header' => [],
+                    'dataRows' => [],
+                    'sheetId' => $sheetId,
+                    'sheetNameFilter' => $sheetNameFilter,
+                    'status' => '',
+                    'date' => ''
+                ]);
+            }
+    
+            $header = $sheetData[0];
+            $dataRows = array_slice($sheetData, 1);
+    
             $userEmail = Auth::user()->email;
-            // dd($userEmail); // Optional for debugging
     
-            // Filter data based on user email (if provided)
             if ($userEmail) {
                 $filteredDataRows = [];
-                $emailColIndex = 11; /* Index of the column containing email addresses */;
+                $emailColIndex = 11;
     
                 foreach ($dataRows as $rowData) {
-                    // Check if the email column exists and has a value
-                    if (isset($rowData[$emailColIndex])) {
-                        $email = $rowData[$emailColIndex]; // Get the email value
-                        
-                        // ... rest of your filtering logic using $email ...
-                        if ($email === $userEmail) {
-                            $filteredDataRows[] = $rowData; // Add the row to filtered data
-                        }
-                        
-                    } else {
-                        // Handle rows with empty email values (optional: log error, skip row, assign placeholder)
-                        // You can comment out this block if you don't want to handle empty values
-                        // echo "Row skipped: Email column is empty"; // Optional: Log a message
-                        continue; // Skip rows with empty email columns
+                    if (isset($rowData[$emailColIndex]) && $rowData[$emailColIndex] === $userEmail) {
+                        $filteredDataRows[] = $rowData;
                     }
                 }
-          //  dd($email);
-                // dd($filteredDataRows); // Optional for debugging after email filtering
                 $dataRows = $filteredDataRows;
             }
     
-            // **Apply additional filtering based on date and status (if provided)**
             $date = $request->get('date');
-            $status = $request->get('status');
-            $email = $request->get('email');
-            if ($date) {
-            $filteredDataRows = [];
-            $dateColIndex = 6; 
-            $statusColIndex=9; // Assuming "Date" column is at index 6
-
-            // Iterate over data rows and filter based on the provided date
-            foreach ($dataRows as $rowData) {
-                // Check if the date column exists in the current row
-                if (isset($rowData[$dateColIndex])) {
-                    // Format the cell date to match the provided date format
-                    $cellDate = date('Y-m-d', strtotime($rowData[$dateColIndex]));
-
-                    // Compare the formatted cell date with the provided date
-                    if ($cellDate === $date) {
-                        // If status is also provided, check and filter by status
-                        if (!$status || $rowData[$statusColIndex] === $status) {
-                            $filteredDataRows[] = $rowData; // Add the row to filtered data
+            $status = $request->get('status', '');  // Default to empty string
+    
+            if ($date || $status) {
+                $filteredDataRows = [];
+                $dateColIndex = 6;
+                $statusColIndex = 9;
+    
+                foreach ($dataRows as $rowData) {
+                    $match = true;
+    
+                    if ($date) {
+                        $cellDate = isset($rowData[$dateColIndex]) ? date('Y-m-d', strtotime($rowData[$dateColIndex])) : '';
+                        if ($cellDate !== $date) {
+                            $match = false;
                         }
                     }
-                    
+    
+                    if ($status && isset($rowData[$statusColIndex])) {
+                        if (strtolower($rowData[$statusColIndex]) !== strtolower($status)) {
+                            $match = false;
+                        }
+                    }
+    
+                    if ($match) {
+                        $filteredDataRows[] = $rowData;
+                    }
                 }
-            }
-               // dd($filteredDataRows);
                 $dataRows = $filteredDataRows;
-                
             }
     
-            // Pass the data, header, sheet name, and sheetId to the view
-            return view('sheets.sheettables', compact('header', 'dataRows', 'sheetName', 'sheetId'));
+            return view('sheets.sheettables', compact('header', 'dataRows', 'sheetNameFilter', 'sheetId', 'status', 'date'));
     
         } catch (\Exception $e) {
-            // Handle potential errors during Google Sheets API interaction
             return view('sheets.sheettables', [
                 'message' => 'Failed to fetch data from Google Sheet',
                 'header' => [],
                 'dataRows' => [],
-                'sheetId' => $sheetId
+                'sheetId' => $sheetId,
+                'sheetNameFilter' => $sheetNameFilter,
+                'status' => '',
+                'date' => ''
             ]);
         }
     }
-
+    
     
 
-    public function update(Request $request, Sheet $sheet)
-{
-    $data = $request->input('data');
-
-    // Log the received data and sheet model for debugging
-    Log::info('Received data:', ['data' => $data]);
-
-    // Option 1: Log specific sheet model properties
-    $sheetData = [
-        'id' => $sheet->id,
-        'name' => $sheet->name,
-        // Add other relevant properties as needed
-    ];
-    Log::info('Sheet model:', $sheetData);
-
-    // Option 2 (less efficient): Log the entire sheet model (as JSON)
-    // Log::info('Sheet model (JSON):', $sheet->toJson()); // Use this if needed
-
-    // Validate the data structure
-    if (!is_array($data) || empty($data)) {
-        return redirect()->back()->withErrors(['Invalid data format or no data provided.']);
-    }
-
-    foreach ($data as $row) {
-        if (!is_array($row)) {
-            return redirect()->back()->withErrors(['Each row of data must be an array.']);
+    public function update(Request $request, $sheetId)
+    {
+        $request->validate([
+            'data' => 'required|array',
+            'sheet_name' => 'required|string', // Ensure sheet_name is provided
+        ]);
+    
+        $data = $request->input('data');
+        $sheetName = $request->input('sheet_name'); // Get the sheet name from the request
+        $rows = [];
+    
+        foreach ($data as $index => $row) {
+            // Ensure that each row is an array of values
+            $rows[] = array_values($row);
+        }
+    
+        // Debugging: Log the data to be updated
+        Log::info('Updating Google Sheet with the following data:', ['sheetId' => $sheetId, 'sheetName' => $sheetName, 'rows' => $rows]);
+    
+        try {
+            $response = Sheets::spreadsheet($sheetId)->sheet($sheetName)->range('A2')->update($rows);
+    
+            // Debugging: Log the API response
+            Log::info('Google Sheets API response:', ['response' => $response]);
+    
+            return redirect()->back()->with('success', 'Data updated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Failed to update Google Sheet: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update data.');
         }
     }
+    
 
-    // Convert data to the format required by Google Sheets
-    $header = array_keys(reset($data));
-    $sheetData = array_merge([$header], array_map('array_values', $data));
 
-    try {
-        Sheets::spreadsheet($sheet->sheet_id)->sheet('Sheet1')->update($sheetData);
-        return redirect()->back()->with('success', 'Sheet updated successfully.');
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['Error updating sheet: ' . $e->getMessage()]);
-    }
-}
-
-     
     public function waybills()
     {
-        return View ('waybill');
+        return view('waybill');
     }
-
 }
