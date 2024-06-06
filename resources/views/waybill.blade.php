@@ -89,6 +89,10 @@
             text-align: center;
             margin-top: 20px;
         }
+        .logo img {
+            max-width: 100px;
+            max-height: 100px;
+        }
     </style>
 </head>
 
@@ -96,10 +100,11 @@
 
     <div id="invoice-POS">
 
-        <center id="top">
-            <div class="logo"></div>
+        <center id="top" class="logo">
+          <img src="public/assets/img/realdeal logo.png" alt="Realdeal Logistics Logo">
+
             <div class="info">
-                <h1>Realdeal Logistics</h1>
+                <h2>Realdeal Logistics</h2>
             </div>
         </center>
 
@@ -184,7 +189,7 @@
             </div>
 
             <div class="qr-code">
-                {!! DNS2D::getBarcodeHTML("{{$orderNo}}",'QRCODE') !!}
+                {!! DNS2D::getBarcodeHTML("$orderNo,",'QRCODE',7,7) !!}
             </div>
 
         </div>

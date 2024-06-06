@@ -17,6 +17,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use Str;
 use Dompdf\Dompdf;
+use Illuminate\Support\Facades\View;
 
 use App\Models\Sheet;
 use Google\Service\Sheets\Sheet as SheetsSheet;
@@ -163,7 +164,6 @@ class DispatchController extends Controller
                 'clientCity' => $rowData[5], // Assuming the client city is in the sixth column
                 'date' => $rowData[6], // Assuming the date is in the seventh column
                 'phone' => $rowData[7], // Assuming the phone is in the eighth column
-                // Add more data as needed
             ])->render();
 
             // Generate a PDF file for the waybill using the HTML content
@@ -171,11 +171,11 @@ class DispatchController extends Controller
             $dompdf->loadHtml($waybillHtml);
             $dompdf->setPaper('A4', 'portrait');
             $dompdf->render();
-            
+
             // Save the PDF file to storage
             $filename = 'waybill_' . $rowData[0] . '.pdf'; // Assuming the order no is used for filename
             Storage::put('waybills/' . $filename, $dompdf->output());
-            
+
             // Store the generated waybill filename
             $generatedWaybills[] = $filename;
         }
@@ -185,7 +185,7 @@ class DispatchController extends Controller
         return response()->json(['message' => $successMessage, 'waybills' => $generatedWaybills]);
 
     } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['message' => 'Failed to generate waybills']);
+        return redirect()->back()->withErrors(['message' => 'Failed to generate waybills: ' . $e->getMessage()]);
     }
 }
 

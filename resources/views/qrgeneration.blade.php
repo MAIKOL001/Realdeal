@@ -116,7 +116,7 @@
                                             <thead class="thead-dark">
                                                 <tr>
                                                     <th class="align-middle"></th>
-                                                    {{-- {!! DNS2D::getBarcodeHTML("$product->code",'QRCODE',) !!} --}}
+                                                     {!! DNS2D::getBarcodeHTML("PC-09-00000000001",'QRCODE',) !!}
                                                     <th class="align-middle text-center">Qr codes</th>
                                                     
                                                 </tr>
