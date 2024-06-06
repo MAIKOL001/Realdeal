@@ -156,6 +156,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dispatch/create', [DispatchController::class, 'create'])->name('dispatch.create');
     Route::get('/dispatch/index', [DispatchController::class, 'index'])->name('dispatch.index');
     Route::get('/dispatch/{sheetId}', [DispatchController::class, 'show'])->name('dispatch.show');
+    Route::post('/dispatch/upload/{sheetId}', [DispatchController::class, 'upload'])->name('dispatch.upload');
+    Route::post('/dispatch/{sheetId}/update', [DispatchController::class,'update'])->name('dispatch.update');
+
     //Distributors
     Route::get('/distributors', [DistributorController::class, 'index'])->name('distributors.index');
     Route::get('/distributors/create', [DistributorController::class, 'create'])->name('distributors.create');
