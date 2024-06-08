@@ -1,200 +1,189 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<!DOCTYPE html>
 
-<head>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
+	<head>
+		<meta charset="utf-8">
+		<title>Invoice</title>
+		<link rel="stylesheet" href="style.css">
+		<style>
+            /* reset */
 
-        #invoice-POS {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #FFF;
-            box-shadow: 0 0 1in -0.25in rgba(0, 0, 0, 0.5);
-        }
+*
+{
+	border: 0;
+	box-sizing: content-box;
+	color: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	font-style: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	text-decoration: none;
+	vertical-align: top;
+}
 
-        #invoice-POS h1 {
-            font-size: 1.5em;
-            color: #222;
-        }
+/* content editable */
 
-        #invoice-POS h2 {
-            font-size: 1.2em;
-        }
+*[contenteditable] { border-radius: 0.25em; min-width: 1em; outline: 0; }
 
-        #invoice-POS h3 {
-            font-size: 1.2em;
-            font-weight: 300;
-            line-height: 2em;
-        }
+*[contenteditable] { cursor: pointer; }
 
-        #invoice-POS p {
-            font-size: 0.9em;
-            color: #666;
-            line-height: 1.2em;
-        }
+*[contenteditable]:hover, *[contenteditable]:focus, td:hover *[contenteditable], td:focus *[contenteditable], img.hover { background: #DEF; box-shadow: 0 0 1em 0.5em #DEF; }
 
-        #invoice-POS .info {
-            margin: 20px 0;
-        }
+span[contenteditable] { display: inline-block; }
 
-        #invoice-POS .title {
-            float: right;
-        }
+/* heading */
 
-        #invoice-POS .title p {
-            text-align: right;
-        }
+h1 { font: bold 100% sans-serif; letter-spacing: 0.5em; text-align: center; text-transform: uppercase; }
 
-        #invoice-POS table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+/* table */
 
-        #invoice-POS .tabletitle {
-            font-size: 0.9em;
-            background: #EEE;
-            padding: 5px 0;
-        }
+table { font-size: 75%; table-layout: fixed; width: 100%; }
+table { border-collapse: separate; border-spacing: 2px; }
+th, td { border-width: 1px; padding: 0.5em; position: relative; text-align: left; }
+th, td { border-radius: 0.25em; border-style: solid; }
+th { background: #EEE; border-color: #BBB; }
+td { border-color: #DDD; }
 
-        #invoice-POS .service {
-            border-bottom: 1px solid #EEE;
-        }
+/* page */
 
-        #invoice-POS .itemtext {
-            font-size: 0.9em;
-        }
+html { font: 16px/1 'Open Sans', sans-serif; overflow: auto; padding: 0.5in; }
+html { background: #999; cursor: default; }
 
-        #invoice-POS #legalcopy {
-            margin-top: 5mm;
-        }
+body { box-sizing: border-box; height: 11in; margin: 0 auto; overflow: hidden; padding: 0.5in; width: auto; }
+body { background: #FFF; border-radius: 1px; box-shadow: 0 0 1in -0.25in rgba(0, 0, 0, 0.5); }
 
-        .row {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
+/* header */
 
-        .column {
-            width: 48%;
-        }
+header { margin: 0 0 3em; }
+header:after { clear: both; content: ""; display: table; }
 
-        .qr-code {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .logo img {
-            max-width: 100px;
-            max-height: 100px;
-        }
-    </style>
-</head>
+header h1 { background:black; border-radius: 0.25em; color: whitesmoke; margin: 0 0 1em; padding: 0.5em 0; }
+header address { float: left; font-size: 75%; font-style: normal; line-height: 1.25; margin: 0 1em 1em 0; }
+header address p { margin: 0 0 0.25em; }
+header span, header img { display: block; float: right; }
+header span { margin: 0 0 1em 1em; max-height: 25%; max-width: 60%; position: relative; }
+header img { max-height: 100%; max-width: 100%; }
+header input { cursor: pointer; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; height: 100%; left: 0; opacity: 0; position: absolute; top: 0; width: 100%; }
 
-<body>
+/* article */
 
-    <div id="invoice-POS">
+article, article address, table.meta, table.inventory { margin: 0 0 3em; }
+article:after { clear: both; content: ""; display: table; }
+article h1 { clip: rect(0 0 0 0); position: absolute; }
 
-        <center id="top" class="logo">
-          <img src="public/assets/img/realdeal logo.png" alt="Realdeal Logistics Logo">
+article address { float: left; font-size: 125%; font-weight:none; }
 
-            <div class="info">
-                <h2>Realdeal Logistics</h2>
-            </div>
-        </center>
+/* table meta & balance */
 
-        <div id="mid" class="row">
-            <div class="column">
-                <div class="info">
-                    <h2>Shipped From:</h2>
-                    <p>
-                        Realdeal Logistics<br>
-                        +254 758 928 555<br>
-                        Realdeallogistics@gmail.com<br>
-                        "Your trusted delivery company"
-                    </p>
-                </div>
-            </div>
-            <div class="column">
-                <div class="info">
-                    <h2>Shipped To:</h2>
-                    <p>
-                        {{ $clientName }}<br>
-                        {{ $phone }}<br>
-                        {{ $date }}<br>
-                        {{ $clientCity }}<br>
-                    </p>
-                </div>
-            </div>
-        </div>
+table.meta, table.balance { float: right; width: 36%; }
+table.meta:after, table.balance:after { clear: both; content: ""; display: table; }
 
-        <div id="bot">
+/* table meta */
 
-            <div id="table">
-                <table>
-                    <tr class="tabletitle">
-                        <td class="item">
-                            <h2>Item</h2>
-                        </td>
-                        <td class="Hours">
-                            <h2>Amount</h2>
-                        </td>
-                        <td class="Hours">
-                            <h2>Quantity</h2>
-                        </td>
-                        <td class="Rate">
-                            <h2>Total Amount</h2>
-                        </td>
-                    </tr>
+table.meta th { width: 40%; }
+table.meta td { width: 60%; }
 
-                    <tr class="service">
-                        <td class="tableitem">
-                            <p class="itemtext">{{ $item }}</p>
-                        </td>
-                        <td class="tableitem">
-                            <p class="itemtext">{{ $amount }}</p>
-                        </td>
-                        <td class="tableitem">
-                            <p class="itemtext">{{ $quantity }}</p>
-                        </td>
-                        <td class="tableitem">
-                            <p class="itemtext">{{ intval($amount) * intval($quantity) }}</p>
-                        </td>
-                    </tr>
+/* table items */
 
-                    <tr class="tabletitle">
-                        <td></td>
-                        <td></td>
-                        <td class="Rate">
-                            <h2>Amount Total</h2>
-                        </td>
-                        <td class="payment">
-                            <h2>{{ intval($amount) * intval($quantity) }}</h2>
-                        </td>
-                    </tr>
+table.inventory { clear: both; width: 100%; }
+table.inventory th { font-weight: bold; text-align: center; }
 
-                </table>
-            </div>
+table.inventory td:nth-child(1) { width: 26%; }
+table.inventory td:nth-child(2) { width: 38%; }
+table.inventory td:nth-child(3) { text-align: right; width: 12%; }
+table.inventory td:nth-child(4) { text-align: right; width: 12%; }
+table.inventory td:nth-child(5) { text-align: right; width: 12%; }
 
-            <div id="legalcopy">
-                <p class="legal"><strong>Thank you for your business!</strong> Payment is expected within 31 days;
-                    please process this invoice within that time. There will be a 5% interest charge per month on late
-                    invoices.
-                </p>
-            </div>
+/* table balance */
 
-            <div class="qr-code">
-                {!! DNS2D::getBarcodeHTML("$orderNo,",'QRCODE',7,7) !!}
-            </div>
+table.balance th, table.balance td { width: 50%; }
+table.balance td { text-align: right; }
 
-        </div>
-    </div>
+/* aside */
 
-</body>
+aside h1 { border: none; border-width: 0 0 1px; margin: 0 0 1em; }
+aside h1 { border-color: #999; border-bottom-style: solid; }
 
+@page { margin: 0; }
+        </style>
+		
+	</head>
+	<body>
+		<header>
+			<h1>Realdeal Logistics</h1>
+			<address contenteditable>
+				<p>info@realdeallogistics.co.ke</p>
+				<p>+254 1118 820 82<br>Nairobi</p>
+				<p></p>
+			</address>
+			<span>{!! DNS2D::getBarcodeHTML("$orderNo | $item | $quantity",'QRCODE',6,6) !!}<input type="file" accept="image/*"></span>
+		</header>
+		<article>
+			<h1>Shipped To:</h1>
+			<address contenteditable>
+				<p>.</p>
+                 <p><span></span> {{$clientName}}</p><br>
+            <p><span>Phone: </span> {{$phone}}<br></p><br>
+        </p><span>Date: </span> {{$date}}<br></p><br>
+    <p><span>Location: </span> {{$clientCity}}</p><br>
+    
+			</address>
+			<table class="meta">
+				<tr>
+					<th><span contenteditable>Invoice #</span></th>
+					<td><span contenteditable>{{$orderNo}}</span></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Date</span></th>
+					<td><span contenteditable>{{$date}}</span></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Order No</span></th>
+					<td><span id="prefix" contenteditable></span><span>{{$orderNo}}</span></td>
+				</tr>
+			</table>
+			<table class="inventory">
+				<thead>
+					<tr>
+						<th><span contenteditable>Item</span></th>
+						<th><span contenteditable>Amount</span></th>
+						<th><span contenteditable>Quantity</span></th>
+						<th><span contenteditable>Price</span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><span contenteditable>{{$item}}</span></td>
+						<td><span contenteditable>{{$amount}}</span></td>
+						<td><span data-prefix></span><span contenteditable>{{$quantity}}</span></td>
+						<td><span data-prefix>Ksh</span><span>{{$amount}}</span></td>
+					</tr>
+				</tbody>
+			</table>
+			<p>PayBill No:234567<br>
+            Account No: 678584</p>
+			<table class="balance">
+				<tr>
+					<th><span contenteditable>Total Price</span></th>
+					<td><span data-prefix>Ksh</span><span>{{ intval($amount) * intval($quantity) }}</span></td>
+				</tr>
+				<tr>
+					<th><span contenteditable>Amount to be Paid</span></th>
+					<td><span data-prefix>Ksh</span><span contenteditable>{{ intval($amount) * intval($quantity) }}</span></td>
+				</tr>
+				
+			</table>
+		</article>
+		<aside>
+			<h1><span contenteditable>www.realdeallogistics.co.ke</span></h1>
+            <center>
+			<div contenteditable>
+				<p>Your trusted logistics company</p>
+			</div>
+            </center>
+		</aside>
+	</body>
 </html>

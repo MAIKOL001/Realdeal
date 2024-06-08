@@ -27,8 +27,8 @@
                         </div>
                     </div>
                 </div>
-               <!-- Filter Form -->
-               <form method="GET" action="{{ route('dispatch.show', $sheetId) }}">
+                <!-- Filter Form -->
+                <form method="GET" action="{{ route('dispatch.show', $sheetId) }}">
                     @csrf
                     <div class="row gx-3 mb-3 p-3">
                         <div class="col-md-4">
@@ -60,43 +60,42 @@
                     @csrf
                     <input type="hidden" name="status" value="{{ request('status', '') }}">
                     <input type="hidden" name="sheet_name" value="{{ $sheetNameFilter }}">
-                    
+
+                    <!-- Include header and dataRows as hidden inputs -->
+                    <input type="hidden" name="header" value="{{ json_encode($header) }}">
+                    <input type="hidden" name="dataRows" value="{{ json_encode($dataRows) }}">
+
                     <x-spinner.loading-spinner />
                     <button type="submit" class="btn btn-success">Generate Waybills</button>
                 </form>
-                
-                
             </div>
         </div>
     </div>
-   
-    
-            <div class="table-responsive" style="padding-top: 1rem;">
-                @if (isset($header) && isset($dataRows))
-                    <table wire:loading.remove class="table table-bordered text-nowrap datatable">
-                        <thead>
-                            <tr>
-                                @foreach ($header as $heading)
-                                    <th scope="col" class="align-middle text-center">{{ $heading }}</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($dataRows as $index => $rowData)
-                                <tr>
-                                    @foreach ($rowData as $colIndex => $cell)
-                                        <td class="align-middle text-center">
-                                            <input type="text" name="data[{{ $index }}][{{ $colIndex }}]" value="{{ $cell }}" class="form-control">
-                                        </td>
-                                    @endforeach
-                                </tr>
+
+    <div class="table-responsive" style="padding-top: 1rem;">
+        @if (isset($header) && isset($dataRows))
+            <table wire:loading.remove class="table table-bordered text-nowrap datatable">
+                <thead>
+                    <tr>
+                        @foreach ($header as $heading)
+                            <th scope="col" class="align-middle text-center">{{ $heading }}</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($dataRows as $index => $rowData)
+                        <tr>
+                            @foreach ($rowData as $colIndex => $cell)
+                                <td class="align-middle text-center">
+                                    <input type="text" name="data[{{ $index }}][{{ $colIndex }}]" value="{{ $cell }}" class="form-control">
+                                </td>
                             @endforeach
-                        </tbody>
-                    </table>
-                @else
-                    <p>No data to display.</p>
-                @endif
-            </div>
-        </div>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <p>No data to display.</p>
+        @endif
     </div>
 @endsection
