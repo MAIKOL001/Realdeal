@@ -75,9 +75,9 @@
                     <input type="hidden" name="sheet_name" value="{{ request('sheet_name', 'Sheet1') }}">
 
                     <!-- Include header and dataRows as hidden inputs -->
-                    <input type="" name="header" value="{{ json_encode($header) }}">
-                    <input type="" name="dataRows" value="{{ json_encode($dataRows) }}">
-                    <input type="date" class="form-control" id="date" name="date" value="{{ $date }}" >
+                    <input type="" name="header" value="{{ json_encode($header) }}" hidden>
+                    <input type="" name="dataRows" value="{{ json_encode($dataRows) }}"hidden>
+                    <input type="date" class="form-control" id="date" name="date" value="{{ $date }}"hidden >
                     <x-spinner.loading-spinner />
                     <button type="submit" class="btn btn-success">Generate Waybills</button>
                 </form>
