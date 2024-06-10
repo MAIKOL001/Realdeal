@@ -2,7 +2,7 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>Invoice</title>
+		<title>waybill template</title>
 		<link rel="stylesheet" href="style.css">
 		<style>
             /* reset */
@@ -163,8 +163,8 @@ aside h1 { border-color: #999; border-bottom-style: solid; }
 					</tr>
 				</tbody>
 			</table>
-			<p>PayBill No:234567<br>
-            Account No: 678584</p>
+			<p>PayBill No: 910200<br>
+            Account No: 2110119703</p>
 			<table class="balance">
 				<tr>
 					<th><span contenteditable>Total Price</span></th>

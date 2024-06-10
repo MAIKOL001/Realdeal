@@ -125,37 +125,38 @@ class SheetController extends Controller
     
     
 
-    public function update(Request $request, $sheetId)
-    {
-        $request->validate([
-            'data' => 'required|array',
-            'sheet_name' => 'required|string', // Ensure sheet_name is provided
-        ]);
-    
-        $data = $request->input('data');
-        $sheetName = $request->input('sheet_name'); // Get the sheet name from the request
-        $rows = [];
-    
-        foreach ($data as $index => $row) {
-            // Ensure that each row is an array of values
-            $rows[] = array_values($row);
-        }
-    
-        // Debugging: Log the data to be updated
-        Log::info('Updating Google Sheet with the following data:', ['sheetId' => $sheetId, 'sheetName' => $sheetName, 'rows' => $rows]);
-    
-        try {
-            $response = Sheets::spreadsheet($sheetId)->sheet($sheetName)->range('A2')->update($rows);
-    
-            // Debugging: Log the API response
-            Log::info('Google Sheets API response:', ['response' => $response]);
-    
-            return redirect()->back()->with('success', 'Data updated successfully.');
-        } catch (\Exception $e) {
-            Log::error('Failed to update Google Sheet: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to update data.');
-        }
+   public function update(Request $request, $sheetId)
+{
+    $request->validate([
+        'data' => 'required|array',
+        'sheet_name' => 'required|string', // Ensure sheet_name is provided
+    ]);
+
+    $data = $request->input('data');
+    $sheetName = $request->input('sheet_name'); // Get the sheet name from the request
+    $rows = [];
+
+    foreach ($data as $index => $row) {
+        $rows[] = array_values($row);
     }
+
+    // Debugging: Log the data to be updated
+    Log::info('Updating Google Sheet with the following data:', ['sheetId' => $sheetId, 'sheetName' => $sheetName, 'rows' => $rows]);
+
+    try {
+        // Update the specified range in the Google Sheet
+        $response = Sheets::spreadsheet($sheetId)->sheet($sheetName)->range('A2')->update($rows);
+
+        // Debugging: Log the API response
+        Log::info('Google Sheets API response:', ['response' => $response]);
+
+        return redirect()->back()->with('success', 'Data updated successfully.');
+    } catch (\Exception $e) {
+        Log::error('Failed to update Google Sheet: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'Failed to update data.');
+    }
+}
+
     
 
 

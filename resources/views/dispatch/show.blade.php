@@ -17,13 +17,25 @@
                     <h3 class="mb-1">Success</h3>
                     <p>{{ session('success') }}</p>
                     <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                    @if (session('pdf_download'))
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                var link = document.createElement('a');
+                                link.href = "{{ session('pdf_download') }}";
+                                link.download = "waybills.pdf";
+                                link.click();
+                            }, 5000); // Delay for 5000 milliseconds (5 seconds)
+                        };
+                    </script>
+                @endif
                 </div>
             @endif
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h3 class="card-title">Spreadsheet Name: {{ $sheetNameFilter }}</h3>
+                            <h3 class="card-title">Spreadsheet Name: {{ request('sheet_name', 'Sheet1') }}</h3>
                         </div>
                     </div>
                 </div>
@@ -34,13 +46,14 @@
                         <div class="col-md-4">
                             <select class="form-select" id="status" name="status">
                                 <option value="">All</option>
-                                <option value="schedulled" @if($status == 'schedulled') selected @endif>Schedulled</option>
-                                <option value="reschedulled" @if($status == 'reschedulled') selected @endif>Reschedulled</option>
+                                <option value="schedulled" @if(request('status') == 'schedulled') selected @endif>Schedulled</option>
+                                <option value="reschedulled" @if(request('status') == 'reschedulled') selected @endif>Reschedulled</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <input type="date" class="form-control" id="date" name="date" value="{{ $date }}">
-                        </div>
+                         <!-- Other fields -->
+        <div class="col-md-4">
+            <input type="date" class="form-control" id="date" name="date" value="{{ $date }}">
+        </div>
                         <div class="col-md-4">
                             <select class="form-select" id="sheet_name" name="sheet_name">
                                 <option value="Sheet1" {{ request('sheet_name') == 'Sheet1' ? 'selected' : '' }}>Sheet1</option>
@@ -59,12 +72,12 @@
                 <form method="POST" action="{{ route('dispatch.update', $sheetId) }}">
                     @csrf
                     <input type="hidden" name="status" value="{{ request('status', '') }}">
-                    <input type="hidden" name="sheet_name" value="{{ $sheetNameFilter }}">
+                    <input type="hidden" name="sheet_name" value="{{ request('sheet_name', 'Sheet1') }}">
 
                     <!-- Include header and dataRows as hidden inputs -->
-                    <input type="hidden" name="header" value="{{ json_encode($header) }}">
-                    <input type="hidden" name="dataRows" value="{{ json_encode($dataRows) }}">
-
+                    <input type="" name="header" value="{{ json_encode($header) }}">
+                    <input type="" name="dataRows" value="{{ json_encode($dataRows) }}">
+                    <input type="date" class="form-control" id="date" name="date" value="{{ $date }}" >
                     <x-spinner.loading-spinner />
                     <button type="submit" class="btn btn-success">Generate Waybills</button>
                 </form>
