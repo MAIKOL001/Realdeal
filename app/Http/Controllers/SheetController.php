@@ -169,94 +169,94 @@ class SheetController extends Controller
 
     
     
-        public function sync(Request $request)
-        {
-            $query = SheetOrder::query();
-    
-            if ($request->filled('date')) {
-                $query->whereDate('date', $request->input('date'));
-            }
-    
-            $sheetOrders = $query->get();
-    
-            return view('syncsheets', compact('sheetOrders'));
+    public function sync(Request $request)
+    {
+        $query = SheetOrder::query();
+
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->input('date'));
         }
-    
-        public function updateSheet(Request $request)
-        {
-            $orderNos = $request->input('order_no');
-            $statuses = $request->input('status');
-            $agents = $request->input('agent');
-    
-            // Initialize Google Sheets API
-            $client = new \Google_Client();
-            $client->setAuthConfig(storage_path('project-423911-84ac0fbdde59.json'));
-            $client->addScope(\Google_Service_Sheets::SPREADSHEETS);
-            $service = new \Google_Service_Sheets($client);
-    
-            // Verify each input is an array before logging
-            if (is_array($orderNos) && is_array($statuses) && is_array($agents)) {
-                // Loop through each index of the array
-                foreach ($orderNos as $index => $orderNo) {
-                    // Get corresponding status and agent for each orderNo
-                    $status = $statuses[$index];
-                    $agent = $agents[$index];
-    
-                    // Fetch the corresponding SheetOrder record
-                    $sheetOrder = SheetOrder::where('order_no', $orderNo)->first();
-                    if (!$sheetOrder) {
-                        continue; // Skip if order not found
-                    }
-    
-                    $spreadsheetId = $sheetOrder->sheet_id;
-                    $sheetName = $sheetOrder->sheet_name;
-                    $range = "{$sheetName}!A2:Z"; // Adjust range as needed
-    
-                    // Log each set of data
-                    Log::info("Updating Google Sheet: Order No - {$orderNo}, Status - {$status}, Agent - {$agent}, Sheet ID - {$spreadsheetId}, Sheet Name - {$sheetName}");
-    
-                    // Find the row number based on order_no
-                    $response = $service->spreadsheets_values->get($spreadsheetId, $range);
-                    $values = $response->getValues();
-    
-                    $rowIndex = -1;
-                    foreach ($values as $i => $row) {
-                        if (isset($row[0]) && $row[0] == $orderNo) { // Assuming order_no is in the first column (index 0)
-                            $rowIndex = $i + 2; // +2 because rows start from A2
-                            break;
-                        }
-                    }
-    
-                    if ($rowIndex == -1) {
-                        Log::warning("Row not found for Order No: {$orderNo} in Sheet Name: {$sheetName}. Skipping update.");
-                        continue; // Skip if order not found in the sheet
-                    }
-    
-                    // Update the status and agent in the sheet
-                    $updateRange = "{$sheetName}!I{$rowIndex}:J{$rowIndex}"; // Status in column 9, Agent in column 8
-                    $values = [
-                        [$agent, $status]
-                    ];
-                    $body = new \Google_Service_Sheets_ValueRange([
-                        'values' => $values
-                    ]);
-    
-                    $params = [
-                        'valueInputOption' => 'RAW'
-                    ];
-    
-                    $result = $service->spreadsheets_values->update($spreadsheetId, $updateRange, $body, $params);
-    
-                    // Log the API response
-                    Log::info("Google Sheets API response:", ['response' => $result]);
+
+        $sheetOrders = $query->get();
+
+        return view('syncsheets', compact('sheetOrders'));
+    }
+
+    public function updateSheet(Request $request)
+    {
+        $orderNos = $request->input('order_no');
+        $statuses = $request->input('status');
+        $agents = $request->input('agent');
+
+        // Initialize Google Sheets API
+        $client = new \Google_Client();
+        $client->setAuthConfig(storage_path('project-423911-84ac0fbdde59.json'));
+        $client->addScope(\Google_Service_Sheets::SPREADSHEETS);
+        $service = new \Google_Service_Sheets($client);
+
+        // Verify each input is an array before logging
+        if (is_array($orderNos) && is_array($statuses) && is_array($agents)) {
+            // Loop through each index of the array
+            foreach ($orderNos as $index => $orderNo) {
+                // Get corresponding status and agent for each orderNo
+                $status = $statuses[$index];
+                $agent = $agents[$index];
+
+                // Fetch the corresponding SheetOrder record
+                $sheetOrder = SheetOrder::where('order_no', $orderNo)->first();
+                if (!$sheetOrder) {
+                    continue; // Skip if order not found
                 }
-            } else {
-                // Log an error if input arrays are not as expected
-                Log::error("Invalid input data format: order_no, status, or agent is not an array.");
+
+                $spreadsheetId = $sheetOrder->sheet_id;
+                $sheetName = $sheetOrder->sheet_name;
+                $range = "{$sheetName}!A2:Z"; // Adjust range as needed
+
+                // Log each set of data
+                Log::info("Updating Google Sheet: Order No - {$orderNo}, Status - {$status}, Agent - {$agent}, Sheet ID - {$spreadsheetId}, Sheet Name - {$sheetName}");
+
+                // Find the row number based on order_no
+                $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+                $values = $response->getValues();
+
+                $rowIndex = -1;
+                foreach ($values as $i => $row) {
+                    if (isset($row[0]) && $row[0] == $orderNo) { // Assuming order_no is in the first column (index 0)
+                        $rowIndex = $i + 2; // +2 because rows start from A2
+                        break;
+                    }
+                }
+
+                if ($rowIndex == -1) {
+                    Log::warning("Row not found for Order No: {$orderNo} in Sheet Name: {$sheetName}. Skipping update.");
+                    continue; // Skip if order not found in the sheet
+                }
+
+                // Update the status and agent in the sheet
+                $updateRange = "{$sheetName}!I{$rowIndex}:J{$rowIndex}"; // Status in column 9, Agent in column 8
+                $values = [
+                    [$agent, $status]
+                ];
+                $body = new \Google_Service_Sheets_ValueRange([
+                    'values' => $values
+                ]);
+
+                $params = [
+                    'valueInputOption' => 'RAW'
+                ];
+
+                $result = $service->spreadsheets_values->update($spreadsheetId, $updateRange, $body, $params);
+
+                // Log the API response
+                Log::info("Google Sheets API response:", ['response' => $result]);
             }
-    
-            return redirect()->back()->with('success', 'Orders updated successfully in the sheet');
+        } else {
+            // Log an error if input arrays are not as expected
+            Log::error("Invalid input data format: order_no, status, or agent is not an array.");
         }
+
+        return redirect()->back()->with('success', 'Orders updated successfully in the sheet');
+    }
     }
 
     

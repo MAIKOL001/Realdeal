@@ -32,84 +32,89 @@ class DispatchController extends Controller
 
 
     public function show(Request $request, $sheetId)
-    {
-        try {
-            $sheet = Sheet::where('sheet_id', $sheetId)->first(['sheet_id', 'sheet_name']);
-    
-            if (!$sheet) {
-                return abort(404);
-            }
-    
-            // Default to 'Sheet1' if no sheet name is provided in the request
-            $sheetNameFilter = $request->get('sheet_name', 'Sheet1');
-    
-            // Fetch data from the specified sheet
-            $sheetData = Sheets::spreadsheet($sheetId)->sheet($sheetNameFilter)->all();
-    
-            if (empty($sheetData)) {
-                return view('dispatch.show', [
-                    'message' => 'No data found in the selected sheet',
-                    'header' => [],
-                    'dataRows' => [],
-                    'sheetId' => $sheetId,
-                    'sheetNameFilter' => $sheetNameFilter,
-                    'status' => '',
-                    'date' => ''
-                ]);
-            }
-    
-            $header = $sheetData[0];
-            $dataRows = array_slice($sheetData, 1);
-    
-            $date = $request->get('date');
-            $status = $request->get('status', '');  // Default to empty string
-    
-            $filteredDataRows = [];
-            $dateColIndex = 6;
-            $statusColIndex = 9;
-    
-            foreach ($dataRows as $rowData) {
-                $match = true;
-    
-                if ($date) {
-                    $cellDate = isset($rowData[$dateColIndex]) ? date('Y-m-d', strtotime($rowData[$dateColIndex])) : '';
-                    if ($cellDate !== $date) {
-                        $match = false;
-                    }
-                }
-    
-                $allowedStatuses = ['schedulled', 'reschedulled']; // List of allowed statuses
-                if (isset($rowData[$statusColIndex])) {
-                    $statusValue = strtolower($rowData[$statusColIndex]);
-                    if (!in_array($statusValue, $allowedStatuses)) {
-                        $match = false;
-                    }
-                } else {
-                    // Handle rows without a status (optional)
-                    // You can decide to exclude them (here) or display them with a default message
-                }
-    
-                if ($match) {
-                    $filteredDataRows[] = $rowData;
-                }
-            }
-            $dataRows = $filteredDataRows;
-            return view('dispatch.show', compact('header', 'dataRows', 'sheetNameFilter', 'sheetId', 'status', 'date'));
+{
+    // Initialize variables with default values
+    $header = [];
+    $dataRows = [];
+    $sheetNameFilter = 'Sheet1';
+    $status = '';
+    $date = '';
 
-            return view('dispatch.show', compact('header', 'dataRows', 'sheetNameFilter', 'sheetId', 'status', 'date'));
-    
-        } catch (\Exception $e) {
+    try {
+        $sheet = Sheet::where('sheet_id', $sheetId)->first(['sheet_id', 'sheet_name']);
+
+        if (!$sheet) {
+            return abort(404);
+        }
+
+        // Default to 'Sheet1' if no sheet name is provided in the request
+        $sheetNameFilter = $request->get('sheet_name', 'Sheet1');
+
+        // Fetch data from the specified sheet
+        $sheetData = Sheets::spreadsheet($sheetId)->sheet($sheetNameFilter)->all();
+
+        if (empty($sheetData)) {
             return view('dispatch.show', [
-                'header' => $header,
-                'dataRows' => $filteredDataRows,
-                'sheetNameFilter' => $sheetNameFilter,
+                'message' => 'No data found in the selected sheet',
+                'header' => [],
+                'dataRows' => [],
                 'sheetId' => $sheetId,
-                'status' => $status,
-                'date' => $date
+                'sheetNameFilter' => $sheetNameFilter,
+                'status' => '',
+                'date' => ''
             ]);
         }
+
+        $header = $sheetData[0];
+        $dataRows = array_slice($sheetData, 1);
+
+        $date = $request->get('date');
+        $status = $request->get('status', '');  // Default to empty string
+
+        $filteredDataRows = [];
+        $dateColIndex = 6;
+        $statusColIndex = 9;
+
+        foreach ($dataRows as $rowData) {
+            $match = true;
+
+            if ($date) {
+                $cellDate = isset($rowData[$dateColIndex]) ? date('Y-m-d', strtotime($rowData[$dateColIndex])) : '';
+                if ($cellDate !== $date) {
+                    $match = false;
+                }
+            }
+
+            $allowedStatuses = ['schedulled', 'reschedulled']; // List of allowed statuses
+            if (isset($rowData[$statusColIndex])) {
+                $statusValue = strtolower($rowData[$statusColIndex]);
+                if (!in_array($statusValue, $allowedStatuses)) {
+                    $match = false;
+                }
+            } else {
+                // Handle rows without a status (optional)
+                // You can decide to exclude them (here) or display them with a default message
+            }
+
+            if ($match) {
+                $filteredDataRows[] = $rowData;
+            }
+        }
+        $dataRows = $filteredDataRows;
+        return view('dispatch.show', compact('header', 'dataRows', 'sheetNameFilter', 'sheetId', 'status', 'date'));
+
+    } catch (\Exception $e) {
+        return view('dispatch.show', [
+            'header' => $header,
+            'dataRows' => $dataRows,
+            'sheetNameFilter' => $sheetNameFilter,
+            'sheetId' => $sheetId,
+            'status' => $status,
+            'date' => $date
+        ]);
     }
- 
+}
+
     
   
 
