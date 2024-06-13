@@ -47,13 +47,22 @@
                                                         <path fill="#e8f5e9" d="M31,23H17h-2v2v2v2v2v2v2v2h18v-2v-2v-2v-2v-2v-2v-2H31z M17,25h4v2h-4V25z M17,29h4v2h-4V29z M17,33h4v2h-4V33z M31,35h-8v-2h8V35z M31,31h-8v-2h8V31z M31,27h-8v-2h8V27z"></path>
                                                     </svg>
                                                 </span>
+                                               
                                             </div>
                                             <div class="col">
                                                 <div class="font-weight-medium">
                                                     <a href="{{ route('sheets.show', $sheet->sheet_id) }}">
                                                         {{ $sheet->sheet_name }}
-                                                    </a>                                                
+                                                    </a>
+                                                   <br>
+                                                   <span>
+                                                    <a href="">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="15" height="15" viewBox="0 0 16 16">
+                                                            <polygon fill="#00b569" points="15,16 16,15 16,9 10,9 9,10"></polygon><path fill="#00b569" d="M12.293,11.293l-0.237,0.238C9.98,13.609,9.541,14,8,14c-2.206,0-4-1.794-4-4V9H2v1 c0,3.309,2.691,6,6,6c2.419,0,3.375-0.958,5.471-3.056l0.236-0.237L12.293,11.293z"></path><polygon fill="#00b569" points="1,0 0,1 0,7 6,7 7,6"></polygon><path fill="#00b569" d="M3.707,4.707l0.237-0.238C6.02,2.391,6.459,2,8,2c2.206,0,4,1.794,4,4v1h2V6c0-3.309-2.691-6-6-6 C5.581,0,4.625,0.958,2.529,3.056L2.293,3.293L3.707,4.707z"></path>
+                                                            </svg></a>
+                                                </span>                                                 
                                                 </div>
+                                                
                                             </div>
                                         </div>
                                     </div>

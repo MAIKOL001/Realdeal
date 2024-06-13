@@ -142,7 +142,7 @@ aside h1 { border-color: #999; border-bottom-style: solid; }
 				</tr>
 				<tr>
 					<th><span contenteditable>Order No</span></th>
-					<td><span id="prefix" contenteditable></span><span>{{$orderNo}}</span></td>
+					<td><span contenteditable>{{ $orderNo }}</span></td>
 				</tr>
 			</table>
 			<table class="inventory">

@@ -137,12 +137,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/sheets', [SheetController::class, 'store'])->name('sheets.store');
     Route::get('/sheets/{sheetId}', [SheetController::class, 'show'])->name('sheets.show');
     Route::get('/waybill', [SheetController::class, 'waybills'])->name('waybill');
- 
-   
-
     Route::put('/sheets/{sheetId}/update', [SheetController::class, 'update'])->name('sheets.update');
     Route::get('/sheets/{sheetId}/waybill', [SheetController::class, 'printWaybill'])->name('sheets.printWaybill');
-    
+    Route::get('/syncsheets' , [SheetController::class, 'sync'])->name('sheetssync');
+    Route::post('/updateSheet', [SheetController::class, 'updateSheet'])->name('updateSheet');
     
 
     // Route::post('/sheets/{sheetId}/update', [SheetController::class, 'update'])->name('sheets.update');
@@ -153,11 +151,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
    
 
     //Route Dispatch
+   
+Route::post('/search-order', [DispatchController::class, 'searchOrder'])->name('search.order');
     Route::get('/dispatch/create', [DispatchController::class, 'create'])->name('dispatch.create');
     Route::get('/dispatch/index', [DispatchController::class, 'index'])->name('dispatch.index');
+    Route::get('/riderdispatch', [DispatchController::class, 'dispatch'])->name('dispatch.riderdispatch');
     Route::get('/dispatch/{sheetId}', [DispatchController::class, 'show'])->name('dispatch.show');
     Route::post('/dispatch/upload/{sheetId}', [DispatchController::class, 'upload'])->name('dispatch.upload');
     Route::post('/dispatch/{sheetId}/update', [DispatchController::class,'update'])->name('dispatch.update');
+    Route::get('/clear-search', [DispatchController::class, 'clearSearch'])->name('clear.search');
+    Route::post('/assign-rider', [DispatchController::class, 'assignRider'])->name('assign.rider');
+    Route::get('/ridersheetpdfs',[DispatchController::class,'sheet'])->name('ridersheetpdfs');
+    Route::post('/orders/search', [DispatchController::class, 'search'])->name('orders.search');
+    Route::post('/orders/generate_pdf', [DispatchController::class,'generatePdf'])->name('orders.generate_pdf');
+
 
     //Distributors
     Route::get('/distributors', [DistributorController::class, 'index'])->name('distributors.index');

@@ -52,14 +52,7 @@
                                     </div>
 
 
-                                    <x-tom-select
-                                        label="Suppliers"
-                                        id="supplier_id"
-                                        name="supplier_id"
-                                        placeholder="Select Customer"
-                                        :data="$suppliers"
-                                    />
-
+                              
                                     <div class="col-md-4">
                                         <label for="reference" class="form-label required">
                                             {{ __('Reference') }}

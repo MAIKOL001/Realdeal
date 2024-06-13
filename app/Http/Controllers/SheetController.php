@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sheet;
+use App\Models\SheetOrder;
 use Google\Service\Sheets\Sheet as SheetsSheet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Revolution\Google\Sheets\Facades\Sheets;
+use Google_Client;
+use Google_Service_Sheets;
 
 class SheetController extends Controller
 {
@@ -157,11 +160,114 @@ class SheetController extends Controller
     }
 }
 
-    
 
 
     public function waybills()
     {
         return view('waybill');
     }
+
+    public function sync()
+    {
+        $sheetOrders = SheetOrder::all();
+        return view('syncsheets', compact('sheetOrders'));
+    }
+
+    public function updateSheet(Request $request)
+{
+    $orderNos = $request->input('order_no');
+    $statuses = $request->input('status');
+    $agents = $request->input('agent');
+
+    // Initialize Google Sheets API
+    $client = new \Google_Client();
+    $client->setAuthConfig(storage_path('project-423911-84ac0fbdde59.json'));
+    $client->addScope(\Google_Service_Sheets::SPREADSHEETS);
+    $service = new \Google_Service_Sheets($client);
+
+    // Verify inputs are arrays
+    if (is_array($orderNos) && is_array($statuses) && is_array($agents)) {
+        try {
+            // Loop through each sheet
+            foreach ($orderNos as $index => $orderNo) {
+                // Fetch the corresponding SheetOrder record
+                $sheetOrder = SheetOrder::where('order_no', $orderNo)->first();
+                if (!$sheetOrder) {
+                    Log::warning("SheetOrder not found for Order No: $orderNo. Skipping update.");
+                    continue;
+                }
+
+                $spreadsheetId = $sheetOrder->sheet_id;
+                $sheetName = $sheetOrder->sheet_name; // Assuming sheet_name is fetched correctly
+
+                // Log the data being updated
+                Log::info("Updating Google Sheet: Order No - $orderNo, Status - $statuses[$index], Agent - $agents[$index], Sheet ID - $spreadsheetId, Sheet Name - $sheetName");
+
+                // Find and update the row in the specific sheet
+                $range = "$sheetName!A:Z"; // Adjust range as needed
+                $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+                $values = $response->getValues();
+
+                if (empty($values)) {
+                    Log::warning("No data found in sheet: $sheetName. Skipping update.");
+                    continue;
+                }
+
+                $updated = false;
+                foreach ($values as $i => $row) {
+                    if (isset($row[0]) && $row[0] == $orderNo) { // Assuming Order No is in the first column
+                        // Update status in column J (index 9) and agent in column I (index 8)
+                        $updateRangeStatus = "$sheetName!J" . ($i + 1);
+                        $updateRangeAgent = "$sheetName!I" . ($i + 1);
+
+                        // Prepare values for status and agent updates
+                        $valuesStatus = [
+                            [$statuses[$index]]
+                        ];
+                        $valuesAgent = [
+                            [$agents[$index]]
+                        ];
+
+                        // Prepare value ranges for status and agent updates
+                        $bodyStatus = new \Google_Service_Sheets_ValueRange([
+                            'values' => $valuesStatus
+                        ]);
+                        $bodyAgent = new \Google_Service_Sheets_ValueRange([
+                            'values' => $valuesAgent
+                        ]);
+
+                        // Update status
+                        $resultStatus = $service->spreadsheets_values->update($spreadsheetId, $updateRangeStatus, $bodyStatus, ['valueInputOption' => 'RAW']);
+                        // Update agent
+                        $resultAgent = $service->spreadsheets_values->update($spreadsheetId, $updateRangeAgent, $bodyAgent, ['valueInputOption' => 'RAW']);
+
+                        // Log API responses for debugging
+                        Log::info("Google Sheets API response for Status update: " . json_encode($resultStatus));
+                        Log::info("Google Sheets API response for Agent update: " . json_encode($resultAgent));
+
+                        $updated = true;
+                        break; // Break out of the loop once updated
+                    }
+                }
+
+                if (!$updated) {
+                    Log::warning("Row not found for Order No: $orderNo in Sheet Name: $sheetName. Skipping update.");
+                }
+            }
+
+            return redirect()->back()->with('success', 'Orders updated successfully in the sheets');
+        } catch (\Exception $e) {
+            Log::error("Failed to update Google Sheet: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update data.');
+        }
+    } else {
+        // Log an error if input arrays are not as expected
+        Log::error("Invalid input data format: order_no, status, or agent is not an array.");
+        return redirect()->back()->with('error', 'Invalid input data format.');
+    }
+}
+
+    
+
+    
 }
