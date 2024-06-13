@@ -27,6 +27,17 @@
                         </div>
                     </div>
                 </div>
+                <!-- Filter Form -->
+                <form method="GET" action="{{ route('sheetssync') }}">
+                    <div class="row gx-3 mb-3 p-3">
+                        <div class="col-md-4">
+                            <input type="date" class="form-control" id="date" name="date" value="{{ request('date') }}">
+                        </div>
+                        <div class="col-md-4" style="padding-top: 0.5rem;">
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                        </div>
+                    </div>
+                </form>
                 <form method="POST" action="{{ route('updateSheet') }}">
                     @csrf
                     <div class="table-responsive" style="padding-top:1rem;">
@@ -55,7 +66,7 @@
                                                 <input type="text" name="agent[]" value="{{ $sheetOrder->agent }}" class="form-control">
                                             </td>
                                             <td class="align-middle text-center">
-                                                <input type="text" name=status[] value="{{$sheetOrder->status}}" class="form-control">
+                                                <input type="text" name="status[]" value="{{ $sheetOrder->status }}" class="form-control">
                                             </td>
                                             <td class="align-middle text-center">{{ $sheetOrder->sheet_id }}</td>
                                             <td class="align-middle text-center">{{ $sheetOrder->sheet_name }}</td>
