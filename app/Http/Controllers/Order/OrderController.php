@@ -11,6 +11,8 @@ use App\Models\OrderDetails;
 use App\Models\Product;
 use App\Models\User;
 use App\Mail\StockAlert;
+use App\Models\Sheet;
+use App\Models\SheetOrder;
 use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
@@ -20,16 +22,26 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Str;
 
+
 class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::where('user_id', auth()->id())->count();
-
-        return view('orders.index', [
-            'orders' => $orders
-        ]);
+        try {
+            // Retrieve all orders from the sheet_orders table
+            $orders = SheetOrder::all();
+    
+            return view('orders.index', [
+                'orders' => $orders
+            ]);
+        } catch (\Exception $e) {
+            // Handle any exceptions that may occur
+            return view('orders.index', [
+                'message' => 'Failed to retrieve orders'
+            ]);
+        }
     }
+    
 
     public function create()
     {

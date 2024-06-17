@@ -14,7 +14,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Pdf;
 use Illuminate\Support\Facades\Log;
 use Revolution\Google\Sheets\Facades\Sheets;
 use Illuminate\Support\Facades\DB;
-
+use Safaricom\Mpesa\Mpesa;
+use Str;
 
 class DispatchController extends Controller
 {
@@ -259,37 +260,64 @@ public function storeOrders($dataRows, $sheetId, $sheetName)
         // Decode the JSON string into an array
         $orders = json_decode($dataRows, true);
         Log::info('Storing orders', ['orders' => $orders]);
-        // Iterate through each order and store it in the database
+
+        // Initialize an array to keep track of duplicate orders
+        $duplicateOrders = [];
+
+        // Iterate through each order
         foreach ($orders as $order) {
-            SheetOrder::create([
-                'order_no' => $order[0],
-                'amount' => $order[1],
-                'quantity' => $order[2],
-                'item' => $order[3],
-                'client_name' => $order[4],
-                'client_city' => $order[5],
-                'date' => $order[6],
-                'phone' => $order[7],
-                'agent' => $order[8] ?? null,
-                'status' => $order[9] ?? null,
-                'code' => $order[10] ?? null,
-                'email' => $order[11] ?? null,
-                'invoice_code' => $order[12] ?? null,
-                'sheet_id' => $sheetId,
-                'sheet_name' => $sheetName,
-                // Add more fields as needed
-            ]);
+            $existingOrder = SheetOrder::where('order_no', $order[0])
+                                       ->where('sheet_id', $sheetId)
+                                       ->first();
+
+            if ($existingOrder) {
+                // Update status and agent of the existing order
+                $existingOrder->update([
+                    'status' => $order[9] ?? $existingOrder->status,
+                    'agent' => $order[8] ?? $existingOrder->agent,
+                ]);
+
+                // Add to duplicate orders list
+                $duplicateOrders[] = $order[0];
+            } else {
+                // Create a new order
+                SheetOrder::create([
+                    'order_no' => $order[0],
+                    'amount' => $order[1],
+                    'quantity' => $order[2],
+                    'item' => $order[3],
+                    'client_name' => $order[4],
+                    'client_city' => $order[5],
+                    'date' => $order[6],
+                    'phone' => $order[7],
+                    'agent' => $order[8] ?? null,
+                    'status' => $order[9] ?? null,
+                    'code' => $order[10] ?? null,
+                    'email' => $order[11] ?? null,
+                    'invoice_code' => $order[12] ?? null,
+                    'sheet_id' => $sheetId,
+                    'sheet_name' => $sheetName,
+                ]);
+            }
+        }
+
+        // Log duplicate orders
+        if (!empty($duplicateOrders)) {
+            Log::info('Duplicate orders found and updated', ['duplicate_orders' => $duplicateOrders]);
+
+            // Return a message with the details of the duplicate orders
+            return redirect()->back()->withErrors(['message' => 'Duplicate orders updated: ' . implode(', ', $duplicateOrders)]);
         }
 
         // Orders stored successfully
         return true;
-        Log::info('Orders stored successfully');
     } catch (\Exception $e) {
         // Log the error and return false
         Log::error('Failed to store orders: ' . $e->getMessage());
         return false;
     }
 }
+
 
 
 public function dispatch(Request $request)
@@ -373,52 +401,7 @@ public function assignRider(Request $request)
     return redirect('riderdispatch')->with('success', 'Rider assigned successfully to selected orders.');
 }
 
-public function sheet()
-{
-    $distributors = Distributor::all();
-    $orders = collect(); // Initialize $orders as an empty collection
-    $date = null; // Default value for date
-    $agent = null; // Default value for agent
-    
-    return view('ridersheetpdfs', compact('distributors', 'orders', 'date', 'agent'));
-}
-
-
-    
-
-    public function search(Request $request)
-    {
-        // Validate the input
-        $validatedData = $request->validate([
-            'date' => 'required|date',
-            'agent' => 'required|string|exists:distributors,name',
-        ]);
-    
-        // Retrieve and format the input values
-        $date = Carbon::parse($validatedData['date'])->format('Y-m-d');
-        $agent = $validatedData['agent'];
-    
-        // Query orders by date and agent name
-        $orders = SheetOrder::whereDate('date', $date)
-                              ->where('agent', $agent)
-                              ->get();
-    
-        // Check if the request is for PDF
-        if ($request->input('generate_pdf')) {
-            // Load the existing Blade view
-            $pdf = $this->generatePDF($orders, $date, $agent);
-            return $pdf->stream('orders.pdf');
-        }
-    
-        // Get the list of distributors again for the dropdown in the view
-        $distributors = Distributor::all();
-    
-        // Pass the orders and distributors to the view
-        return view('ridersheetpdfs', compact('orders', 'distributors','date','agent'));
-    }
-    
-    
-    public function generatePdf(Request $request)
+  public function generatePdf(Request $request)
     {
         // Retrieve the orders data from the request
         $orders = json_decode($request->input('data'));
@@ -449,9 +432,118 @@ public function sheet()
         // Output the generated PDF
         return $dompdf->stream('orders.pdf');
     }
-     
 
 
+
+    public function sheet()
+{
+    $distributors = Distributor::all();
+    $orders = collect(); // Initialize $orders as an empty collection
+    $date = null; // Default value for date
+    $agent = null; // Default value for agent
+    
+    return view('ridersheetpdfs', compact('distributors', 'orders', 'date', 'agent'));
+}
+
+public function search(Request $request)
+{
+    // Validate the input
+    $validatedData = $request->validate([
+        'date' => 'required|date',
+        'agent' => 'required|string|exists:distributors,name',
+        'order_no' => 'nullable|string', // Allow order number to be nullable
+    ]);
+
+    // Retrieve and format the input values
+    $date = Carbon::parse($validatedData['date'])->format('Y-m-d');
+    $agent = $validatedData['agent'];
+    $orderNo = $request->input('order_no'); // Retrieve order number from request
+
+    // Query orders by date and agent name, optionally filtering by order number
+    $query = SheetOrder::whereDate('date', $date)
+                       ->where('agent', $agent);
+
+    if ($orderNo) {
+        $query->where('order_no', $orderNo);
+    }
+
+    $orders = $query->get();
+
+    // Check if the request is for PDF
+    if ($request->input('generate_pdf')) {
+        // Load the existing Blade view
+        $pdf = $this->generatePDF($orders, $date, $agent);
+        return $pdf->stream('orders.pdf');
+    }
+
+    // Get the list of distributors again for the dropdown in the view
+    $distributors = Distributor::all();
+
+    // Pass the orders and distributors to the view
+    return view('ridersheetpdfs', compact('orders', 'distributors', 'date', 'agent'));
+}
+
+
+    public function stk(Request $request)
+{
+    try {
+        // Validate and format phone number
+        $phone = $request->phone;
+        $phone = preg_replace('/\D/', '', $phone); // Remove non-digit characters
+
+        // Add country code if missing (assuming Kenya)
+        if (!Str::startsWith($phone, '254')) {
+            $phone = '254' . substr($phone, -9); // Assuming the last 9 digits are the local number
+        }
+
+        // Log the phone number received and formatted for STK Push
+        Log::info('Phone Number for STK Push: ' . $phone);
+
+        // Initialize M-Pesa SDK
+        $mpesa = new \Safaricom\Mpesa\Mpesa();
+
+        // Parameters for STK push simulation
+        $BusinessShortCode = '174379';  // Your business shortcode
+        $LipaNaMpesaPasskey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';  // Lipa Na M-Pesa Online Passkey
+        $TransactionType = 'CustomerPayBillOnline';  // Transaction type
+        $Amount = (float) str_replace(',', '', $request->amount);  // Remove any commas if present
+        $PartyA = $phone;  // Customer phone number
+        $PartyB = '174379';  // Your business shortcode
+        $PhoneNumber = $phone;  // Customer phone number
+        $CallBackURL = 'https://yourdomain.com/mpesa/confirmation';  // Callback URL for transaction status
+        $AccountReference = $request->order_no;  // Order number as Account Reference
+        $TransactionDesc = 'Payment for Order ' . $request->order_no;  // Transaction description
+        $Remarks = 'Payment for Order ID: ' . $request->id;  // Additional remarks
+
+        // Perform STK push simulation
+        $stkPushSimulation = $mpesa->STKPushSimulation(
+            $BusinessShortCode,
+            $LipaNaMpesaPasskey,
+            $TransactionType,
+            $Amount,
+            $PartyA,
+            $PartyB,
+            $PhoneNumber,
+            $CallBackURL,
+            $AccountReference,
+            $TransactionDesc,
+            $Remarks
+        );
+        Log::info('Amount for STK Push: ' . $Amount);
+
+        // Log the response for debugging or auditing purposes
+        Log::info('STK Push response: ' . json_encode($stkPushSimulation));
+
+        // Return success response with STK push simulation data
+        return response()->json(['success' => true, 'data' => $stkPushSimulation]);
+
+    } catch (\Exception $e) {
+        // Log and return failure response if STK push fails
+        Log::error('STK Push failed: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => 'STK Push failed: ' . $e->getMessage()]);
+    }
+}
+    
     
 
     

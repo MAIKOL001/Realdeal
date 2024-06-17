@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "africastalking/africastalking": "^3.0",
         "anayarojo/shoppingcart": "^4.2",
         "awobaz/compoships": "^2.2",
         "dompdf/dompdf": "^3.0",
@@ -24,6 +25,7 @@
         "power-components/livewire-powergrid": "^5.1",
         "rappasoft/laravel-livewire-tables": "^3.1",
         "revolution/laravel-google-sheets": "^6.4",
+        "safaricom/mpesa": "^1.0",
         "spatie/laravel-permission": "^6.7"
     },
     "require-dev": {

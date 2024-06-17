@@ -170,7 +170,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         Milon\Barcode\BarcodeServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
-
+        App\Providers\AfricasTalkingServiceProvider::class,
+        \Safaricom\Mpesa\MpesaServiceProvider::class,
         /*
         * Third Party Service Providers...
         */
@@ -192,6 +193,7 @@ return [
         // 'Example' => App\Facades\Example::class,
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
     'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
+    'Mpesa'=> \Safaricom\Mpesa\MpesaServiceProvider::class,
     ])->toArray(),
 
 ];

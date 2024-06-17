@@ -24,7 +24,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\VoiceController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -54,6 +54,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // User Management
     // Route::resource('/users', UserController::class); //->except(['show']);
     Route::put('/user/change-password/{username}', [UserController::class, 'updatePassword'])->name('users.updatePassword');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+// Route for updating user password
+
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
@@ -141,7 +151,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/sheets/{sheetId}/waybill', [SheetController::class, 'printWaybill'])->name('sheets.printWaybill');
     Route::get('/syncsheets' , [SheetController::class, 'sync'])->name('sheetssync');
     Route::post('/updateSheet', [SheetController::class, 'updateSheet'])->name('updateSheet');
-    
+Route::post('/sheets/store', [SheetController::class, 'pushtodb'])->name('sheets.push');
+
 
     // Route::post('/sheets/{sheetId}/update', [SheetController::class, 'update'])->name('sheets.update');
 
@@ -164,7 +175,12 @@ Route::post('/search-order', [DispatchController::class, 'searchOrder'])->name('
     Route::get('/ridersheetpdfs',[DispatchController::class,'sheet'])->name('ridersheetpdfs');
     Route::post('/orders/search', [DispatchController::class, 'search'])->name('orders.search');
     Route::post('/orders/generate_pdf', [DispatchController::class,'generatePdf'])->name('orders.generate_pdf');
+    Route::post('/mpesa/stk', [DispatchController::class, 'stk'])->name('mpesa.stk');
 
+
+
+    //Voice Controller
+    Route::post('/make-call', [VoiceController::class, 'makeCall'])->name('make-call');
 
     //Distributors
     Route::get('/distributors', [DistributorController::class, 'index'])->name('distributors.index');

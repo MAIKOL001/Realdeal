@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Revolution\Google\Sheets\Facades\Sheets;
 use Google_Client;
 use Google_Service_Sheets;
-
+use Illuminate\Support\Facades\Validator;
 class SheetController extends Controller
 {
     public function index()
@@ -39,6 +39,7 @@ class SheetController extends Controller
     public function show(Request $request, $sheetId)
     {
         try {
+            // Fetch the sheet details by sheet_id
             $sheet = Sheet::where('sheet_id', $sheetId)->first();
     
             if (!$sheet) {
@@ -66,20 +67,7 @@ class SheetController extends Controller
             $header = $sheetData[0];
             $dataRows = array_slice($sheetData, 1);
     
-            $userEmail = Auth::user()->email;
-    
-            if ($userEmail) {
-                $filteredDataRows = [];
-                $emailColIndex = 11;
-    
-                foreach ($dataRows as $rowData) {
-                    if (isset($rowData[$emailColIndex]) && $rowData[$emailColIndex] === $userEmail) {
-                        $filteredDataRows[] = $rowData;
-                    }
-                }
-                $dataRows = $filteredDataRows;
-            }
-    
+            // Filter data by date and status if provided in the request
             $date = $request->get('date');
             $status = $request->get('status', '');  // Default to empty string
     
@@ -108,6 +96,7 @@ class SheetController extends Controller
                         $filteredDataRows[] = $rowData;
                     }
                 }
+    
                 $dataRows = $filteredDataRows;
             }
     
@@ -125,6 +114,7 @@ class SheetController extends Controller
             ]);
         }
     }
+    
     
     
 
@@ -257,6 +247,79 @@ class SheetController extends Controller
 
         return redirect()->back()->with('success', 'Orders updated successfully in the sheet');
     }
+
+    public function pushtodb(Request $request)
+{
+    // Validate the incoming request data
+    $request->validate([
+        'sheet_id' => 'required',
+        'sheet_name' => 'required',
+        'data' => 'required|json', // Ensure data is a JSON string
+    ]);
+
+    $sheetId = $request->input('sheet_id');
+    $sheetName = $request->input('sheet_name');
+    $dataRows = $request->input('data');
+
+    try {
+        // Decode the JSON string into an array
+        $orders = json_decode($dataRows, true);
+        Log::info('Storing orders', ['orders' => $orders]);
+
+        // Prepare the data for insertion
+        $insertData = [];
+        $duplicateOrders = [];
+        foreach ($orders as $order) {
+            // Check if order_no already exists in the database
+            if (SheetOrder::where('order_no', $order[0])->exists()) {
+                $duplicateOrders[] = $order[0]; // Collect duplicate order numbers
+                continue; // Skip insertion for this order
+            }
+
+            $insertData[] = [
+                'order_no' => $order[0],
+                'amount' => $order[1],
+                'quantity' => $order[2],
+                'item' => $order[3],
+                'client_name' => $order[4],
+                'client_city' => $order[5],
+                'date' => $order[6],
+                'phone' => $order[7],
+                'agent' => $order[8] ?? null,
+                'status' => $order[9] ?? null,
+                'code' => $order[10] ?? null,
+                'email' => $order[11] ?? null,
+                'invoice_code' => $order[12] ?? null,
+                'sheet_id' => $sheetId,
+                'sheet_name' => $sheetName,
+                // Add more fields as needed
+            ];
+        }
+
+        // Insert the non-duplicate data into the database
+        if (!empty($insertData)) {
+            SheetOrder::insert($insertData);
+            Log::info('Orders stored successfully');
+        }
+
+        // Prepare error message for duplicate orders
+        if (!empty($duplicateOrders)) {
+            $errorMessage = 'Duplicate orders found for order numbers: ' . implode(', ', $duplicateOrders);
+            Log::warning($errorMessage);
+            return redirect()->back()->withErrors(['data' => $errorMessage]);
+        }
+
+        // Redirect with success message if no errors
+        return redirect()->route('sheets.show', $sheetId)->with('success', 'Data stored successfully!');
+    } catch (\Exception $e) {
+        // Log the error and return with an error message
+        Log::error('Failed to store orders: ' . $e->getMessage());
+        return redirect()->back()->withErrors(['data' => 'Failed to store orders: ' . $e->getMessage()]);
+    }
+}
+
+    
+
     }
 
     

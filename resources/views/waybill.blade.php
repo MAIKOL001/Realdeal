@@ -168,11 +168,11 @@ aside h1 { border-color: #999; border-bottom-style: solid; }
 			<table class="balance">
 				<tr>
 					<th><span contenteditable>Total Price</span></th>
-					<td><span data-prefix>Ksh</span><span>{{ intval($amount) * intval($quantity) }}</span></td>
+					<td><span data-prefix>Ksh</span><span>{{$amount}}</span></td>
 				</tr>
 				<tr>
 					<th><span contenteditable>Amount to be Paid</span></th>
-					<td><span data-prefix>Ksh</span><span contenteditable>{{ intval($amount) * intval($quantity) }}</span></td>
+					<td><span data-prefix>Ksh</span><span contenteditable>{{$amount}}</span></td>
 				</tr>
 				
 			</table>

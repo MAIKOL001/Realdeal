@@ -58,7 +58,8 @@
                         <select class="form-select" id="sheet_name" name="sheet_name">
                             <option value="Sheet1" {{ request('sheet_name') == 'Sheet1' ? 'selected' : '' }}>Sheet1</option>
                             <option value="Sheet2" {{ request('sheet_name') == 'Sheet2' ? 'selected' : '' }}>Sheet2</option>
-                            <option value="Sheet3" {{ request('sheet_name') == 'Sheet3' ? 'selected' : '' }}>Sheet3</option>
+                            <option value="JUNE 14" {{ request('sheet_name') == 'JUNE 14' ? 'selected' : '' }}>JUNE 14</option>
+                            <option value="JUNE 15" {{ request('sheet_name') == 'JUNE 15' ? 'selected' : '' }}>JUNE 15</option>
                             <!-- Add more sheets as needed -->
                         </select>
                     </div>
