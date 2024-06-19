@@ -19,6 +19,7 @@ use App\Http\Controllers\Product\ProductImportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Purchase\PurchaseController;
 use App\Http\Controllers\CodeController;
+use App\Http\Controllers\MpesaController;
 use App\Http\Controllers\Quotation\QuotationController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
@@ -175,7 +176,8 @@ Route::post('/search-order', [DispatchController::class, 'searchOrder'])->name('
     Route::get('/ridersheetpdfs',[DispatchController::class,'sheet'])->name('ridersheetpdfs');
     Route::post('/orders/search', [DispatchController::class, 'search'])->name('orders.search');
     Route::post('/orders/generate_pdf', [DispatchController::class,'generatePdf'])->name('orders.generate_pdf');
-    Route::post('/mpesa/stk', [DispatchController::class, 'stk'])->name('mpesa.stk');
+    Route::post('/mpesa/stk', [MpesaController::class, 'stk'])->name('mpesa.stk');
+    Route::post('/mpesa/confirmation', [MpesaController::class, 'handleCallback'])->name('mpesa.confirmation');
 
 
 

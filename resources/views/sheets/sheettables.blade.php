@@ -46,11 +46,13 @@
                     <div class="col-md-4">
                         <select class="form-select" id="sheet_name" name="sheet_name">
                             <option value="Sheet1" {{ request('sheet_name') == 'Sheet1' ? 'selected' : '' }}>Sheet1</option>
+                            <option value="Sheet2" {{ request('sheet_name') == 'Sheet2' ? 'selected' : '' }}>Sheet2</option>
                             <option value="JUNE 14" {{ request('sheet_name') == 'JUNE 14' ? 'selected' : '' }}>JUNE 14</option>
                             <option value="JUNE 15" {{ request('sheet_name') == 'JUNE 15' ? 'selected' : '' }}>JUNE 15</option>
                             <!-- Add more sheets as needed -->
                         </select>
                     </div>
+                    
                     <div class="col-md-1" style="padding-top: 0.5rem;">
                         <button type="submit" class="btn btn-primary">Filter</button>
                     </div>

@@ -86,7 +86,7 @@ class DispatchController extends Controller
                 }
             }
 
-            $allowedStatuses = ['schedulled', 'reschedulled']; // List of allowed statuses
+            $allowedStatuses = ['schedulled', 'reschedulled','scheduled','reschedulled','SCHEDULED','RESCHEDULED']; // List of allowed statuses
             if (isset($rowData[$statusColIndex])) {
                 $statusValue = strtolower($rowData[$statusColIndex]);
                 if (!in_array($statusValue, $allowedStatuses)) {

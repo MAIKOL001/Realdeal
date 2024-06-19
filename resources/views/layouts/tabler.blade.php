@@ -52,7 +52,7 @@
                 </button>
                 <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
                     <a href="{{ url('/') }}">
-                       <h1>logistics.Net</h1>
+                       <h1>Realdeal Logistics</h1>
                     </a>
                 </h1>
                 <div class="navbar-nav flex-row order-md-last">

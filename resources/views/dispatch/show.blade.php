@@ -25,7 +25,7 @@
                                 link.href = "{{ session('pdf_download') }}";
                                 link.download = "waybills.pdf";
                                 link.click();
-                            }, 5000); // Delay for 5000 milliseconds (5 seconds)
+                            }, 1000); // Delay for 5000 milliseconds (5 seconds)
                         };
                     </script>
                 @endif

@@ -64,9 +64,8 @@
                         <h3 class="card-title">Orders List</h3>
                     </div>
                     <div class="card-body">
-                        <div style="padding-top: 1rem;">
+                        <div style="padding-top: 1rem;" class="table-responsive">
                             <table class="table table-bordered" id="products_table">
-                                <!-- Table Header -->
                                 <thead class="thead-dark">
                                     <tr>
                                         <th class="align-middle">Order No</th>
@@ -76,11 +75,12 @@
                                         <th class="align-middle text-center">Client Name</th>
                                         <th class="align-middle text-center">Phone No.</th>
                                         <th class="align-middle text-center">Address</th>
+                                        <th class="align-middle text-center">Status</th>
+                                        <th class="align-middle text-center">Code</th>
                                         <th class="align-middle text-center">Rider/Agent</th>
                                         <th class="align-middle text-center">Action</th>
                                     </tr>
                                 </thead>
-                                <!-- Table Body -->
                                 <tbody>
                                     @if (isset($orders))
                                         @foreach ($orders as $order)
@@ -93,6 +93,8 @@
                                                 <td class="align-middle text-center">{{ $order->client_name }}</td>
                                                 <td class="align-middle text-center">{{ $order->phone }}</td>
                                                 <td class="align-middle text-center">{{ $order->client_city }}</td>
+                                                <td class="align-middle text-center">{{ $order->status }}</td>
+                                                <td class="align-middle text-center">{{ $order->code }}</td>
                                                 <td class="align-middle text-center">{{ $order->agent }}</td>
                                                 <td class="align-middle text-center">
                                                     <button type="button" class="btn btn-icon btn-outline-danger pay-button"
